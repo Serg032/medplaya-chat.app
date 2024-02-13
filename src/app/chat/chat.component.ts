@@ -68,26 +68,25 @@ export class ChatComponent implements OnInit {
   public async sendMessage() {
     try {
       const userMessage = this.messageInput.value;
-      this.chatMessages.push(this.buildChatMessage('user', userMessage));
-      this.messageInput.setValue('');
-      this.showSpinner = true;
 
-      const chatResponse = await fetch('http://localhost:3000', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userMessage }),
-      });
+      if (this.clientId && userMessage) {
+        this.chatMessages.push(this.buildChatMessage('user', userMessage));
+        this.messageInput.setValue('');
+        this.showSpinner = true;
 
-      if (!chatResponse.ok) {
-        throw new Error('Network response was not ok');
-      }
+        const chatResponse = await fetch('http://localhost:3000', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: userMessage }),
+        });
+        if (!chatResponse.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const chatResponseData: ChatResponse = await chatResponse.json();
 
-      const chatResponseData: ChatResponse = await chatResponse.json();
-      const chatMessage = chatResponseData.chatMessage;
-
-      if (this.clientId) {
+        const chatMessage = chatResponseData.chatMessage;
         const createMessageCommand: CreateMessageCommand =
           this.buildCreateMessageCommand(
             this.clientId,
@@ -95,10 +94,13 @@ export class ChatComponent implements OnInit {
             chatMessage
           );
         await this.sendCreatedMessage(createMessageCommand);
+        this.showSpinner = false;
+        this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
+      } else if (!userMessage) {
+        alert('Theres no message');
+      } else {
+        alert('theres no client id');
       }
-
-      this.showSpinner = false;
-      this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
     } catch (error) {
       console.log(error);
     }

@@ -47,6 +47,10 @@
   padding-top: 1rem;
 }
 
+input {
+  width: 80%;
+}
+
 .spinner-container {
   z-index: 100;
   display: flex;
