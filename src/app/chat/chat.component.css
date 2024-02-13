@@ -1,0 +1,52 @@
+main {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* background-color: rgb(46, 111, 89); */
+}
+
+header {
+  /* background-color: rgb(28, 87, 87); */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5rem;
+}
+
+.chat-container {
+  /* background-color: aqua; */
+  position: absolute;
+  top: 5rem;
+  bottom: 5rem;
+  width: 100%;
+}
+
+.chat-input-container {
+  position: absolute;
+  bottom: 0;
+  height: 5rem;
+  background-color: rgb(28, 87, 87);
+  width: 100%;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 1rem;
+  padding-left: 1rem;
+}
+
+.input-message {
+  width: 70%;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  height: 3.5rem;
+}

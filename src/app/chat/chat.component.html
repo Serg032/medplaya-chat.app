@@ -1,1 +1,26 @@
-<p>chat works!</p>
+<main>
+  <header>
+    <h2>Chat</h2>
+  </header>
+  <mat-divider></mat-divider>
+  <div class="chat-container"></div>
+  <mat-divider></mat-divider>
+  <div class="chat-input-container">
+    <mat-form-field class="input-message">
+      <mat-label></mat-label>
+      <input matInput [formControl]="messageInput" />
+    </mat-form-field>
+    <button
+      mat-raised-button
+      type="submit"
+      color="primary"
+      (click)="sendMessage()"
+    >
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Example home icon"
+        fontIcon="send"
+      ></mat-icon>
+    </button>
+  </div>
+</main>
