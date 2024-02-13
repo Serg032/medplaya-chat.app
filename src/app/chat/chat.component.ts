@@ -67,7 +67,7 @@ export class ChatComponent implements OnInit {
       this.chatMessages.push(this.buildChatMessage('user', userMessage));
       this.messageInput.setValue('');
 
-      const response = await fetch('http://localhost:3000', {
+      const chatResponse = await fetch('http://localhost:3000', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,12 +75,13 @@ export class ChatComponent implements OnInit {
         body: JSON.stringify({ message: userMessage }),
       });
 
-      if (!response.ok) {
+      if (!chatResponse.ok) {
         throw new Error('Network response was not ok');
       }
 
-      const responseData: ChatResponse = await response.json();
-      const chatMessage = responseData.chatMessage;
+      const chatResponseData: ChatResponse = await chatResponse.json();
+      const chatMessage = chatResponseData.chatMessage;
+
       if (this.clientId) {
         const createMessageCommand: CreateMessageCommand =
           this.buildCreateMessageCommand(
@@ -88,6 +89,7 @@ export class ChatComponent implements OnInit {
             userMessage,
             chatMessage
           );
+        await this.sendCreatedMessage(createMessageCommand);
       }
 
       this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
@@ -106,7 +108,7 @@ export class ChatComponent implements OnInit {
     };
   }
 
-  private async createMessage(command: CreateMessageCommand) {
+  private async sendCreatedMessage(command: CreateMessageCommand) {
     await fetch('http://localhost:8080/medplaya/message/create', {
       method: 'POST',
       headers: {
@@ -121,10 +123,19 @@ export class ChatComponent implements OnInit {
     question: string,
     chatResponse: string
   ): CreateMessageCommand {
+    let customChatResponse;
+    let customQuestion;
+    if (chatResponse.length > 255) {
+      customChatResponse = chatResponse.slice(0, 200);
+    }
+    if (question.length > 255) {
+      customQuestion = question.slice(0, 200);
+    }
+
     return {
       id: crypto.randomUUID(),
-      question,
-      chatResponse,
+      question: customQuestion ? customQuestion : question,
+      chatResponse: customChatResponse ? customChatResponse : chatResponse,
       clientId,
     };
   }
