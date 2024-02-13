@@ -1,11 +1,22 @@
-<main>
-  <header>
+<div class="main-container">
+  <div class="header-container">
     <h2>Chat</h2>
-  </header>
-  <mat-divider></mat-divider>
-  <div class="chat-container"></div>
-  <mat-divider></mat-divider>
-  <div class="chat-input-container">
+  </div>
+  <div class="messages-container">
+    <mat-card
+      *ngFor="let chatMessage of chatMessages"
+      class="message-container"
+    >
+      <mat-card-content>
+        <span>{{ chatMessage.author }}</span>
+        <br />
+        <span
+          ><b>{{ chatMessage.message }}</b></span
+        >
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="input-container">
     <mat-form-field class="input-message">
       <mat-label></mat-label>
       <input matInput [formControl]="messageInput" />
@@ -23,4 +34,4 @@
       ></mat-icon>
     </button>
   </div>
-</main>
+</div>

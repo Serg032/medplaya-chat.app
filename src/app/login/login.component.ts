@@ -14,6 +14,27 @@ interface Query {
   };
 }
 
+enum Status {
+  PENDDING,
+  OK,
+  NO_OK,
+}
+
+interface LoginResponse {
+  id: string;
+  nif: string;
+  room: string;
+  name: string;
+  status: Status;
+  code: string;
+  username: string;
+  isActive: boolean;
+  amount: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+}
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -39,22 +60,15 @@ export class LoginComponent {
     const room = value.room;
     if (username && room) {
       this.login(username, String(room));
-      console.log({
-        username: {
-          value: username,
-          typeof: typeof username,
-        },
-        room: {
-          value: room,
-          typeof: typeof room,
-        },
-      });
     } else {
       alert('Both fields needed');
     }
   }
 
-  private async login(username: string, room: string) {
+  private async login(
+    username: string,
+    room: string
+  ): Promise<LoginResponse | void> {
     try {
       const query: Query = {
         query: {
@@ -83,11 +97,10 @@ export class LoginComponent {
         alert('Error en el servidor');
         return;
       }
-      console.log('Response', response.status);
 
-      const data = await response.json();
+      const data = (await response.json()) as LoginResponse;
+      this.router.navigate([`chat/${data.id}`]);
       console.log(data);
-      this.router.navigate(['chat']);
       return data;
     } catch (error) {
       console.log(error);
