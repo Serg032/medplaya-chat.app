@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { __param } from 'tslib';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Spinner } from '../ui/spinner/spinner.component';
 
 interface ChatResponse {
   chatMessage: string;
@@ -45,12 +47,14 @@ interface idFromUrl {
     MatIconModule,
     MatCardModule,
     CommonModule,
+    Spinner,
   ],
 })
 export class ChatComponent implements OnInit {
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
   private clientId: string | null = null;
+  public showSpinner: boolean = false;
   constructor(private router: ActivatedRoute) {}
 
   ngOnInit() {
@@ -66,6 +70,7 @@ export class ChatComponent implements OnInit {
       const userMessage = this.messageInput.value;
       this.chatMessages.push(this.buildChatMessage('user', userMessage));
       this.messageInput.setValue('');
+      this.showSpinner = true;
 
       const chatResponse = await fetch('http://localhost:3000', {
         method: 'POST',
@@ -92,6 +97,7 @@ export class ChatComponent implements OnInit {
         await this.sendCreatedMessage(createMessageCommand);
       }
 
+      this.showSpinner = false;
       this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
     } catch (error) {
       console.log(error);
