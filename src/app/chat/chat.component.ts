@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,8 +8,6 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
-import { __param } from 'tslib';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Spinner } from '../ui/spinner/spinner.component';
 
 interface ChatResponse {
@@ -30,10 +28,6 @@ interface CreateMessageCommand {
 
 type messageAuthor = 'user' | 'chat-gpt';
 
-interface idFromUrl {
-  id: string;
-}
-
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -51,6 +45,8 @@ interface idFromUrl {
   ],
 })
 export class ChatComponent implements OnInit {
+  @ViewChild('messagesContainer') messagesContainer!: ElementRef;
+
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
   private clientId: string | null = null;
@@ -70,7 +66,12 @@ export class ChatComponent implements OnInit {
       const userMessage = this.messageInput.value;
 
       if (this.clientId && userMessage) {
+        this.scrollToBottom();
+
         this.chatMessages.push(this.buildChatMessage('user', userMessage));
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, 0);
         this.messageInput.setValue('');
         this.showSpinner = true;
 
@@ -96,6 +97,9 @@ export class ChatComponent implements OnInit {
         await this.sendCreatedMessage(createMessageCommand);
         this.showSpinner = false;
         this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, 0);
       } else if (!userMessage) {
         alert('Theres no message');
       } else {
@@ -146,5 +150,12 @@ export class ChatComponent implements OnInit {
       chatResponse: customChatResponse ? customChatResponse : chatResponse,
       clientId,
     };
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.messagesContainer.nativeElement.scrollTop =
+        this.messagesContainer.nativeElement.scrollHeight;
+    } catch (err) {}
   }
 }
