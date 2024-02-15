@@ -1,14 +1,23 @@
 <main>
-  <h1>Login</h1>
-  <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
-    <mat-form-field>
-      <mat-label>Username</mat-label>
-      <input matInput formControlName="username" />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Room</mat-label>
-      <input matInput type="number" formControlName="room" />
-    </mat-form-field>
-    <button mat-raised-button type="submit" color="primary">Send</button>
-  </form>
+  <div class="images-container">
+    <img src="../../assets/logo.png" alt="medplaya-logo" class="img-logo" />
+    <img
+      src="../../assets/first-background.png"
+      alt="background"
+      class="img-background"
+    />
+  </div>
+  <div class="form-container">
+    <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
+      <mat-form-field>
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Room</mat-label>
+        <input matInput type="number" formControlName="room" />
+      </mat-form-field>
+      <button mat-raised-button type="submit" color="primary">Send</button>
+    </form>
+  </div>
 </main>
