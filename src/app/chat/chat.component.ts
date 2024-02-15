@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
+import { getUserById } from '../helpers/get-user-by-id';
 
 interface ChatResponse {
   chatMessage: string;
@@ -53,12 +54,16 @@ export class ChatComponent implements OnInit {
   public showSpinner: boolean = false;
   constructor(private router: ActivatedRoute) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.router.paramMap
       .pipe(filter((param) => param.has('id')))
       .subscribe((param) => (this.clientId = param.get('id')));
 
     console.log('Client id', this.clientId);
+    if (this.clientId) {
+      const client = await getUserById(this.clientId);
+      console.log(client);
+    }
   }
 
   public async sendMessage() {

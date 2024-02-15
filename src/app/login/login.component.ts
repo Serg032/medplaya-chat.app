@@ -10,7 +10,6 @@ interface Query {
   query: {
     where: {
       username: string;
-      room: string;
     };
   };
 }
@@ -21,19 +20,17 @@ enum Status {
   NO_OK,
 }
 
-interface LoginResponse {
+export interface Client {
   id: string;
-  nif: string;
-  room: string;
   name: string;
-  status: Status;
-  code: string;
+  lastname: string;
   username: string;
-  isActive: boolean;
+  checkin: string;
+  code: string;
+  room: string;
+  status: Status;
+  isActive: true;
   amount: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
 }
 
 @Component({
@@ -54,31 +51,29 @@ export class LoginComponent {
   userProfileForm = new FormGroup({
     username: new FormControl(''),
     checkInDate: new FormControl(new Date()),
-    room: new FormControl(),
   });
 
-  public onSubmit() {
+  public async onSubmit() {
     const value = this.userProfileForm.value;
     const username = value.username;
-    const room = value.room;
-    console.log(this.userProfileForm.value.checkInDate);
-    if (username && room) {
-      this.login(username, String(room));
+    const checkinDate = value.checkInDate;
+
+    if (username && checkinDate) {
+      await this.login(username, checkinDate);
     } else {
-      alert('Both fields needed');
+      alert('All fields needed');
     }
   }
 
   private async login(
     username: string,
-    room: string
-  ): Promise<LoginResponse | void> {
+    checkinDate: Date
+  ): Promise<Client | void> {
     try {
       const query: Query = {
         query: {
           where: {
             username,
-            room,
           },
         },
       };
@@ -102,12 +97,53 @@ export class LoginComponent {
         return;
       }
 
-      const data = (await response.json()) as LoginResponse;
-      this.router.navigate([`chat/${data.id}`]);
-      console.log(data);
-      return data;
+      const client = (await response.json()) as Client;
+
+      return client;
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  private marshallCheckinDateFromDatabase = (
+    stringCheckinDate: string
+  ): Date => {
+    const marshaledCheckin = new Date(stringCheckinDate.slice(0, 10).trim());
+    marshaledCheckin.setHours(0), marshaledCheckin.setMinutes(0);
+    marshaledCheckin.setSeconds(0);
+
+    return marshaledCheckin;
+  };
+
+  private buildEarlyLoginLimit(marshaledCheckinDate: Date): Date {
+    const limit = new Date(marshaledCheckinDate.getTime());
+    limit.setDate(marshaledCheckinDate.getDate() - 3);
+    return limit;
+  }
+
+  private buildLatelyLoginLimit(marshaledCheckoutDate: Date): Date {
+    const limit = new Date(marshaledCheckoutDate.getTime());
+    limit.setDate(marshaledCheckoutDate.getDate() + 1);
+    return limit;
+  }
+
+  private validateClientLogin(client: Client, checkinDate: string): void {
+    const marshaledCheckin = this.marshallCheckinDateFromDatabase(
+      client.checkin
+    );
+    const earlyLoginLimit = this.buildEarlyLoginLimit(marshaledCheckin);
+    const latelyLoginLimit = this.buildLatelyLoginLimit(marshaledCheckin);
+    console.log('marshaled checkin from database', marshaledCheckin);
+    console.log('early limit', earlyLoginLimit);
+    console.log('lately limit', latelyLoginLimit);
+    if (marshaledCheckin === new Date(checkinDate)) {
+      if (new Date() < earlyLoginLimit || new Date() > latelyLoginLimit) {
+        alert('Access denied, too early');
+      } else {
+        this.router.navigate([`chat/${client.id}`]);
+      }
+    } else {
+      alert('Wrong check in date');
     }
   }
 }
