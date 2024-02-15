@@ -55,3 +55,7 @@ form {
   border-top-right-radius: 10%;
   overflow: hidden;
 }
+
+mat-form-field {
+  width: 12rem;
+}
