@@ -4,6 +4,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 interface Query {
   query: {
@@ -45,12 +46,14 @@ interface LoginResponse {
     MatButtonModule,
     MatInputModule,
     ReactiveFormsModule,
+    MatDatepickerModule,
   ],
 })
 export class LoginComponent {
   constructor(private router: Router) {}
   userProfileForm = new FormGroup({
     username: new FormControl(''),
+    checkInDate: new FormControl(new Date()),
     room: new FormControl(),
   });
 
@@ -58,6 +61,7 @@ export class LoginComponent {
     const value = this.userProfileForm.value;
     const username = value.username;
     const room = value.room;
+    console.log(this.userProfileForm.value.checkInDate);
     if (username && room) {
       this.login(username, String(room));
     } else {

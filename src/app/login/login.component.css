@@ -40,12 +40,12 @@ main {
   z-index: 0;
 }
 
-.form-container {
+form {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1rem;
   background-color: whitesmoke;
   position: absolute;
   bottom: 0;
@@ -53,7 +53,5 @@ main {
   height: 55vh;
   border-top-left-radius: 10%;
   border-top-right-radius: 10%;
-}
-
-form {
+  overflow: hidden;
 }
