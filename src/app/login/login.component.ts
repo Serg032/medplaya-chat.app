@@ -26,6 +26,7 @@ export interface Client {
   lastname: string;
   username: string;
   checkin: string;
+  checkout: string;
   code: string;
   room: string;
   status: Status;
@@ -50,7 +51,7 @@ export class LoginComponent {
   constructor(private router: Router) {}
   userProfileForm = new FormGroup({
     username: new FormControl(''),
-    checkInDate: new FormControl(new Date()),
+    checkInDate: new FormControl(''),
   });
 
   public async onSubmit() {
@@ -67,7 +68,7 @@ export class LoginComponent {
 
   private async login(
     username: string,
-    checkinDate: Date
+    checkinDate: string
   ): Promise<Client | void> {
     try {
       const query: Query = {
@@ -98,8 +99,7 @@ export class LoginComponent {
       }
 
       const client = (await response.json()) as Client;
-
-      return client;
+      this.validateClientLogin(client, checkinDate);
     } catch (error) {
       console.log(error);
     }
@@ -111,8 +111,20 @@ export class LoginComponent {
     const marshaledCheckin = new Date(stringCheckinDate.slice(0, 10).trim());
     marshaledCheckin.setHours(0), marshaledCheckin.setMinutes(0);
     marshaledCheckin.setSeconds(0);
+    marshaledCheckin.setMilliseconds(0);
 
     return marshaledCheckin;
+  };
+
+  private marshallCheckoutDateFromDatabase = (
+    stringCheckoutDate: string
+  ): Date => {
+    const marshaledCheckout = new Date(stringCheckoutDate.slice(0, 10).trim());
+    marshaledCheckout.setHours(0), marshaledCheckout.setMinutes(0);
+    marshaledCheckout.setSeconds(0);
+    marshaledCheckout.setMilliseconds(0);
+
+    return marshaledCheckout;
   };
 
   private buildEarlyLoginLimit(marshaledCheckinDate: Date): Date {
@@ -127,23 +139,61 @@ export class LoginComponent {
     return limit;
   }
 
+  private buildToday(): Date {
+    const today = new Date();
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+
+    return today;
+  }
+
   private validateClientLogin(client: Client, checkinDate: string): void {
     const marshaledCheckin = this.marshallCheckinDateFromDatabase(
       client.checkin
     );
+    const marshaledCheckout = this.marshallCheckoutDateFromDatabase(
+      client.checkout
+    );
     const earlyLoginLimit = this.buildEarlyLoginLimit(marshaledCheckin);
-    const latelyLoginLimit = this.buildLatelyLoginLimit(marshaledCheckin);
+    const latelyLoginLimit = this.buildLatelyLoginLimit(marshaledCheckout);
+
     console.log('marshaled checkin from database', marshaledCheckin);
     console.log('early limit', earlyLoginLimit);
     console.log('lately limit', latelyLoginLimit);
-    if (marshaledCheckin === new Date(checkinDate)) {
-      if (new Date() < earlyLoginLimit || new Date() > latelyLoginLimit) {
+    console.log(
+      marshaledCheckin.getTime(),
+      new Date(checkinDate).getTime(),
+      marshaledCheckin.getTime() === new Date(checkinDate).getTime()
+    );
+
+    if (marshaledCheckin.getTime() === new Date(checkinDate).getTime()) {
+      const todayDate = this.buildToday();
+
+      if (todayDate.getTime() < earlyLoginLimit.getTime()) {
         alert('Access denied, too early');
+        return;
+      } else if (todayDate.getTime() > latelyLoginLimit.getTime()) {
+        console.log(
+          todayDate.getTime() > latelyLoginLimit.getTime(),
+          todayDate.getTime(),
+          latelyLoginLimit.getTime(),
+          'Fri Feb 16 2024 00:00:00 GMT+0100 (hora estándar de Europa central)' ===
+            'Fri Feb 16 2024 00:00:00 GMT+0100 (hora estándar de Europa central)'
+        );
+        alert('Access denied, too late');
+        return;
       } else {
-        this.router.navigate([`chat/${client.id}`]);
+        this.navigateToChat(client.id);
       }
     } else {
       alert('Wrong check in date');
+      return;
     }
+  }
+
+  private navigateToChat(clientId: string) {
+    return this.router.navigate([`chat/${clientId}`]);
   }
 }
