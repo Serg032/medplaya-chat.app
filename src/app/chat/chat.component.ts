@@ -29,6 +29,16 @@ interface CreateMessageCommand {
 
 type messageAuthor = 'user' | 'chat-gpt';
 
+// Asegura que SpeechRecognitionEvent esté disponible globalmente
+declare global {
+  interface SpeechRecognitionEvent extends Event {
+    // Define la estructura de SpeechRecognitionEvent según la especificación
+    results: SpeechRecognitionResultList;
+  }
+}
+
+declare var webkitSpeechRecognition: any;
+
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -52,7 +62,18 @@ export class ChatComponent implements OnInit {
   public chatMessages: ChatMessage[] = [];
   private clientId: string | null = null;
   public showSpinner: boolean = false;
-  constructor(private router: ActivatedRoute) {}
+
+  recognition: any;
+  recognizedText: string = '';
+
+  constructor(private router: ActivatedRoute) {
+    this.recognition = new webkitSpeechRecognition();
+    this.recognition.lang = 'es-ES';
+    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+      this.recognizedText = event.results[0][0].transcript;
+      this.messageInput.setValue(this.messageInput.value + this.recognizedText);
+    };
+  }
 
   async ngOnInit() {
     this.router.paramMap
@@ -162,5 +183,13 @@ export class ChatComponent implements OnInit {
       this.messagesContainer.nativeElement.scrollTop =
         this.messagesContainer.nativeElement.scrollHeight;
     } catch (err) {}
+  }
+
+  startRecognition() {
+    this.recognition.start();
+  }
+
+  stopRecognition() {
+    this.recognition.stop();
   }
 }
