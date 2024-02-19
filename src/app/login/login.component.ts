@@ -161,15 +161,6 @@ export class LoginComponent {
     const earlyLoginLimit = this.buildEarlyLoginLimit(marshaledCheckin);
     const latelyLoginLimit = this.buildLatelyLoginLimit(marshaledCheckout);
 
-    console.log('marshaled checkin from database', marshaledCheckin);
-    console.log('early limit', earlyLoginLimit);
-    console.log('lately limit', latelyLoginLimit);
-    console.log(
-      marshaledCheckin.getTime(),
-      new Date(checkinDate).getTime(),
-      marshaledCheckin.getTime() === new Date(checkinDate).getTime()
-    );
-
     if (marshaledCheckin.getTime() === new Date(checkinDate).getTime()) {
       const todayDate = this.buildToday();
 
@@ -177,13 +168,6 @@ export class LoginComponent {
         alert('Access denied, too early');
         return;
       } else if (todayDate.getTime() > latelyLoginLimit.getTime()) {
-        console.log(
-          todayDate.getTime() > latelyLoginLimit.getTime(),
-          todayDate.getTime(),
-          latelyLoginLimit.getTime(),
-          'Fri Feb 16 2024 00:00:00 GMT+0100 (hora estándar de Europa central)' ===
-            'Fri Feb 16 2024 00:00:00 GMT+0100 (hora estándar de Europa central)'
-        );
         alert('Access denied, too late');
         return;
       } else {

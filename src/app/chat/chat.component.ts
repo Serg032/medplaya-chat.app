@@ -80,10 +80,8 @@ export class ChatComponent implements OnInit {
       .pipe(filter((param) => param.has('id')))
       .subscribe((param) => (this.clientId = param.get('id')));
 
-    console.log('Client id', this.clientId);
     if (this.clientId) {
       const client = await getUserById(this.clientId);
-      console.log(client);
     }
   }
 
