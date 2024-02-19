@@ -100,8 +100,10 @@ export class LoginComponent {
 
       const client = (await response.json()) as Client;
       this.validateClientLogin(client, checkinDate);
+      return client;
     } catch (error) {
       console.log(error);
+      return;
     }
   }
 
