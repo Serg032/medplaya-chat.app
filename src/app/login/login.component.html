@@ -1,11 +1,7 @@
 <main>
   <div class="images-container">
     <img src="../../assets/logo.png" alt="medplaya-logo" class="img-logo" />
-    <img
-      src="../../assets/caliypso.jpg"
-      alt="background"
-      class="img-background"
-    />
+    <img src="../../assets/oasis.jpg" alt="background" class="img-background" />
   </div>
   <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
     <mat-form-field>
@@ -21,6 +17,8 @@
       ></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
-    <button mat-raised-button type="submit">Send</button>
+    <button mat-flat-button type="submit" color="primary">
+      <span>Send</span>
+    </button>
   </form>
 </main>

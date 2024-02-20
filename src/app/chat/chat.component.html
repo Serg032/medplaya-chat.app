@@ -3,7 +3,12 @@
     <spinner></spinner>
   </div>
   <div class="header-container">
-    <h2>Chat</h2>
+    <h3 *ngIf="client">
+      {{ client.name + " " + client.lastname }}
+    </h3>
+    <h3 *ngIf="!client">
+      CloudIA
+    </h3>
   </div>
   <div class="messages-container" #messagesContainer>
     <mat-card

@@ -59,3 +59,14 @@ form {
 mat-form-field {
   width: 12rem;
 }
+
+button {
+  width: 12rem;
+  height: 2.9rem;
+}
+
+span {
+  color: white;
+  font-weight: bold;
+  font-size: larger;
+}

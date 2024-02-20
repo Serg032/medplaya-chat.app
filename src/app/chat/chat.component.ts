@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
 import { getUserById } from '../helpers/get-user-by-id';
+import { Client } from '../login/login.component';
 
 interface ChatResponse {
   chatMessage: string;
@@ -61,6 +62,7 @@ export class ChatComponent implements OnInit {
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
   private clientId: string | null = null;
+  public client: Client | undefined;
   public showSpinner: boolean = false;
 
   recognition: any;
@@ -81,7 +83,7 @@ export class ChatComponent implements OnInit {
       .subscribe((param) => (this.clientId = param.get('id')));
 
     if (this.clientId) {
-      const client = await getUserById(this.clientId);
+      this.client = await getUserById(this.clientId);
     }
   }
 
