@@ -4,12 +4,12 @@
 }
 
 .main-container {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  height: 100%;
+  justify-content: space-between; */
   width: 100%;
+  height: 100vh;
 }
 
 .header-container {
@@ -18,42 +18,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(212, 212, 212);
 }
 
-h2 {
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-}
 .messages-container {
-  width: 100%;
-  height: 100%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2rem;
   align-items: center;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  background-color: rgb(173, 172, 172);
+  /* padding-top: 2rem;
+  padding-bottom: 2rem; */
+  background-color: white;
+  position: absolute;
+  top: 2.8rem;
+  bottom: 6rem;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  border-bottom-left-radius: 6%;
+  border-bottom-right-radius: 6%;
+  width: 100%;
 }
 
 .message-container {
   width: 80%;
 }
 
-.input-container {
-  display: flex;
-  width: 100%;
-  justify-content: space-around;
-  background-color: rgb(212, 212, 212);
-  align-items: center;
-  padding-top: 1rem;
-}
-
-input {
+/* input {
   width: 80%;
-}
+} */
 
 .spinner-container {
   z-index: 100;
@@ -65,5 +58,35 @@ input {
   bottom: 0;
   right: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.221);
+}
+
+.input-container {
+  position: absolute;
+  bottom: 0;
+  height: 8rem;
+  display: flex;
+  width: 100%;
+  background-color: #ecaf55;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.icons-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding-bottom: 2rem;
+}
+
+.icon {
+  width: 2rem;
+}
+
+button {
+  color: #ecaf55;
+  background-color: #ecaf55;
+  border: none;
 }

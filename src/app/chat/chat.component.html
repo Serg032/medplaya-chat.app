@@ -6,64 +6,41 @@
     <h3 *ngIf="client">
       {{ client.name + " " + client.lastname }}
     </h3>
-    <h3 *ngIf="!client">
-      CloudIA
-    </h3>
+    <h3 *ngIf="!client">CloudIA</h3>
   </div>
-  <div class="messages-container" #messagesContainer>
-    <mat-card
-      *ngFor="let chatMessage of chatMessages"
-      class="message-container"
-    >
-      <mat-card-content>
-        <span>{{ chatMessage.author }}</span>
-        <br />
-        <span
-          ><b>{{ chatMessage.message }}</b></span
-        >
-      </mat-card-content>
-    </mat-card>
-  </div>
-  <div class="input-container">
-    <mat-form-field class="input-message">
-      <mat-label></mat-label>
-      <input matInput [formControl]="messageInput" />
-    </mat-form-field>
-    <button
-      mat-raised-button
-      type="submit"
-      color="primary"
-      (click)="sendMessage()"
-    >
-      <mat-icon
-        aria-hidden="false"
-        aria-label="Example home icon"
-        fontIcon="send"
-      ></mat-icon>
-    </button>
-    <button
-      mat-raised-button
-      type="submit"
-      color="primary"
-      (click)="startRecognition()"
-    >
-      <mat-icon
-        aria-hidden="false"
-        aria-label="Example home icon"
-        fontIcon="micro"
-      ></mat-icon>
-    </button>
-    <!-- <button
-  mat-raised-button
-  type="submit"
-  color="primary"
-  (click)="stopRecognition()"
->
-  <mat-icon
-    aria-hidden="false"
-    aria-label="Example home icon"
-    fontIcon="stop"
-  ></mat-icon>
-</button> -->
+  <div class="main-container">
+    <div class="spinner-container" *ngIf="showSpinner">
+      <spinner></spinner>
+    </div>
+    <div class="messages-container" #messagesContainer>
+      <mat-card
+        *ngFor="let chatMessage of chatMessages"
+        class="message-container"
+      >
+        <mat-card-content>
+          <span>{{ chatMessage.author }}</span>
+          <br />
+          <span
+            ><b>{{ chatMessage.message }}</b></span
+          >
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div class="input-container">
+      <!-- <div class="input-items-container">
+        <mat-form-field class="input-message">
+          <mat-label></mat-label>
+          <input matInput [formControl]="messageInput" />
+        </mat-form-field>
+      </div>
+      <div class="icons-container">
+        <button type="submit" (click)="sendMessage()">
+          <img class="icon" src="../../assets/send.svg" alt="send-icon" />
+        </button>
+        <button type="submit" (click)="startRecognition()">
+          <img class="icon" src="../../assets/record.svg" alt="send-icon" />
+        </button>
+      </div> -->
+    </div>
   </div>
 </div>
