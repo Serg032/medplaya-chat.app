@@ -27,20 +27,17 @@
       </mat-card>
     </div>
     <div class="input-container">
-      <!-- <div class="input-items-container">
-        <mat-form-field class="input-message">
-          <mat-label></mat-label>
-          <input matInput [formControl]="messageInput" />
-        </mat-form-field>
+      <div class="input-and-buttons-container">
+        <input [formControl]="messageInput" />
+        <div class="icons-container">
+          <button type="submit" (click)="sendMessage()">
+            <img class="icon" src="../../assets/send.svg" alt="send-icon" />
+          </button>
+          <button type="submit" (click)="startRecognition()">
+            <img class="icon" src="../../assets/record.svg" alt="send-icon" />
+          </button>
+        </div>
       </div>
-      <div class="icons-container">
-        <button type="submit" (click)="sendMessage()">
-          <img class="icon" src="../../assets/send.svg" alt="send-icon" />
-        </button>
-        <button type="submit" (click)="startRecognition()">
-          <img class="icon" src="../../assets/record.svg" alt="send-icon" />
-        </button>
-      </div> -->
     </div>
   </div>
 </div>

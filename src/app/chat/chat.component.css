@@ -4,12 +4,7 @@
 }
 
 .main-container {
-  /* display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between; */
   width: 100%;
-  height: 100vh;
 }
 
 .header-container {
@@ -18,6 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-bottom: 1rem;
 }
 
 .messages-container {
@@ -26,8 +22,6 @@
   flex-direction: column;
   gap: 2rem;
   align-items: center;
-  /* padding-top: 2rem;
-  padding-bottom: 2rem; */
   background-color: white;
   position: absolute;
   top: 2.8rem;
@@ -38,15 +32,12 @@
   border-bottom-left-radius: 6%;
   border-bottom-right-radius: 6%;
   width: 100%;
+  padding-bottom: 2rem;
 }
 
 .message-container {
   width: 80%;
 }
-
-/* input {
-  width: 80%;
-} */
 
 .spinner-container {
   z-index: 100;
@@ -73,12 +64,28 @@
   gap: 1rem;
 }
 
+.input-and-buttons-container {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 20px;
+  height: 3rem;
+  margin-bottom: 1rem;
+}
+
+input {
+  outline: none;
+  border: none;
+  height: 2rem;
+}
+
 .icons-container {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  padding-bottom: 2rem;
 }
 
 .icon {
@@ -87,6 +94,6 @@
 
 button {
   color: #ecaf55;
-  background-color: #ecaf55;
   border: none;
+  background-color: white;
 }
