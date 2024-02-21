@@ -17,7 +17,12 @@
         *ngFor="let chatMessage of chatMessages"
         class="message-container"
       >
-        <mat-card-content>
+        <mat-card-content
+          [ngClass]="{
+            'user-message': chatMessage.author === 'user',
+            'chat-message': chatMessage.author === 'chat-gpt'
+          }"
+        >
           <span>{{ chatMessage.author }}</span>
           <br />
           <span
