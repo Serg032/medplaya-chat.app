@@ -118,3 +118,29 @@ button {
   border: none;
   background-color: rgba(255, 255, 255, 0);
 }
+
+@media screen and (min-width: 900px) {
+  .principal {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .main-container {
+    width: 30rem;
+  }
+
+  .header-container {
+    width: 30rem;
+  }
+
+  .messages-container {
+    width: 30rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .input-container {
+    width: 30rem;
+  }
+}

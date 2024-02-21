@@ -1,24 +1,34 @@
-<main>
-  <div class="images-container">
-    <img src="../../assets/logo.png" alt="medplaya-logo" class="img-logo" />
-    <img src="../../assets/oasis.jpg" alt="background" class="img-background" />
-  </div>
-  <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
-    <mat-form-field>
-      <mat-label>Username</mat-label>
-      <input matInput formControlName="username" />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Check-in date</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="checkInDate" />
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="picker"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
-    <button mat-flat-button type="submit" color="primary">
-      <span>Send</span>
-    </button>
-  </form>
-</main>
+<div class="main-container">
+  <main>
+    <div class="images-container">
+      <img src="../../assets/logo.png" alt="medplaya-logo" class="img-logo" />
+      <img
+        src="../../assets/oasis.jpg"
+        alt="background"
+        class="img-background"
+      />
+    </div>
+    <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
+      <mat-form-field>
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Check-in date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="checkInDate"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <button mat-flat-button type="submit" color="primary">
+        <span>Send</span>
+      </button>
+    </form>
+  </main>
+</div>

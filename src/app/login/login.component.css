@@ -12,7 +12,6 @@ main {
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
-  background-color: aqua;
 }
 
 .images-container {
@@ -69,4 +68,20 @@ span {
   color: white;
   font-weight: bold;
   font-size: larger;
+}
+
+@media screen and (min-width: 900px) {
+  .main-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  main {
+    max-width: 30rem;
+  }
+
+  form {
+    max-width: 30rem;
+  }
 }
