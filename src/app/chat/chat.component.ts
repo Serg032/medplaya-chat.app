@@ -19,6 +19,7 @@ interface ChatResponse {
 interface ChatMessage {
   author: string;
   message: string;
+  hour: string;
 }
 
 interface CreateMessageCommand {
@@ -67,6 +68,8 @@ export class ChatComponent implements OnInit {
 
   recognition: any;
   recognizedText: string = '';
+
+  public messageHour = new Date().getHours();
 
   constructor(private router: ActivatedRoute) {
     this.recognition = new webkitSpeechRecognition();
@@ -140,9 +143,17 @@ export class ChatComponent implements OnInit {
     author: messageAuthor,
     message: string
   ): ChatMessage {
+    const rootDate = new Date();
+    const hour = rootDate.getHours();
+    const minutes =
+      rootDate.getMinutes().toString().length === 1
+        ? `0${rootDate.getMinutes()}`
+        : rootDate.getMinutes();
+    const hourString = `${hour.toString()}:${minutes.toString()} `;
     return {
       author,
       message,
+      hour: hourString,
     };
   }
 

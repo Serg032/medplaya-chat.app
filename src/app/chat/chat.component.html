@@ -13,23 +13,22 @@
       <spinner></spinner>
     </div>
     <div class="messages-container" #messagesContainer>
-      <mat-card
-        *ngFor="let chatMessage of chatMessages"
-        class="message-container"
-      >
-        <mat-card-content
+      <div class="card-container" *ngFor="let chatMessage of chatMessages">
+        <mat-card
+          class="message-container"
           [ngClass]="{
             'user-message': chatMessage.author === 'user',
             'chat-message': chatMessage.author === 'chat-gpt'
           }"
         >
-          <span>{{ chatMessage.author }}</span>
-          <br />
-          <span
-            ><b>{{ chatMessage.message }}</b></span
-          >
-        </mat-card-content>
-      </mat-card>
+          <mat-card-content>
+            <span
+              ><b>{{ chatMessage.message }}</b></span
+            >
+          </mat-card-content>
+        </mat-card>
+        <span>{{ chatMessage.hour }}</span>
+      </div>
     </div>
     <div class="input-container">
       <div class="input-and-buttons-container">

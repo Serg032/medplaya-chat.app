@@ -33,10 +33,19 @@
   border-bottom-right-radius: 6%;
   width: 100%;
   padding-bottom: 2rem;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 8px;
+}
+
+.card-container {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .message-container {
-  width: 80%;
+  width: 100%;
 }
 
 .user-message {
@@ -80,13 +89,17 @@
   padding-right: 1rem;
   border-radius: 20px;
   height: 3rem;
+  gap: 1rem;
   margin-bottom: 1rem;
+  box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset,
+    rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
 }
 
 input {
   outline: none;
   border: none;
   height: 2rem;
+  background-color: #ecaf5500;
 }
 
 .icons-container {
@@ -103,5 +116,5 @@ input {
 button {
   color: #ecaf55;
   border: none;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0);
 }
