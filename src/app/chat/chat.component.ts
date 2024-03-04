@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
-import { MedplayaGuest } from '../login/login.component';
 import { GetUserByIdresponse, UserService } from '../services/user.service';
 
 interface ChatResponse {
@@ -65,6 +64,7 @@ export class ChatComponent implements OnInit {
   private guestId: string | null = null;
   public guest: GetUserByIdresponse | undefined;
   public showSpinner: boolean = false;
+  public isFirefox: boolean = false;
 
   recognition: any;
   recognizedText: string = '';
@@ -74,16 +74,21 @@ export class ChatComponent implements OnInit {
   constructor(
     private router: ActivatedRoute,
     private userService: UserService
-  ) {
-    this.recognition = new webkitSpeechRecognition();
-    this.recognition.lang = 'es-ES';
-    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-      this.recognizedText = event.results[0][0].transcript;
-      this.messageInput.setValue(this.messageInput.value + this.recognizedText);
-    };
-  }
+  ) {}
 
   async ngOnInit() {
+    this.isFirefox = navigator.userAgent.includes('Firefox');
+    if (!this.isFirefox) {
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = 'es-ES';
+      this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+        this.recognizedText = event.results[0][0].transcript;
+        this.messageInput.setValue(
+          this.messageInput.value + this.recognizedText
+        );
+      };
+    }
+    console.log('NAvigator', this.isFirefox);
     this.router.paramMap
       .pipe(filter((param) => param.has('id')))
       .subscribe(async (param) => {

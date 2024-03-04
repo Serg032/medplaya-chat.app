@@ -37,7 +37,7 @@
           <button type="submit" (click)="sendMessage()">
             <img class="icon" src="../../assets/send.svg" alt="send-icon" />
           </button>
-          <button type="submit" (click)="startRecognition()">
+          <button *ngIf="!isFirefox" type="submit" (click)="startRecognition()">
             <img class="icon" src="../../assets/record.svg" alt="send-icon" />
           </button>
         </div>
