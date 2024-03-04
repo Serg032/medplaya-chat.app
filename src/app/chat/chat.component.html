@@ -3,10 +3,10 @@
     <spinner></spinner>
   </div>
   <div class="header-container">
-    <h3 *ngIf="client">
-      {{ client.name + " " + client.lastname }}
+    <h3 *ngIf="guest">
+      {{ guest.name + " " + guest.surname1 }}
     </h3>
-    <h3 *ngIf="!client">CloudIA</h3>
+    <h3 *ngIf="!guest">CloudIA</h3>
   </div>
   <div class="main-container">
     <div class="spinner-container" *ngIf="showSpinner">

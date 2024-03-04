@@ -3,35 +3,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { LoginService } from '../services/login.service';
 
-interface Query {
-  query: {
-    where: {
-      username: string;
-    };
-  };
+interface GuestDate {
+  _value: string;
 }
 
-enum Status {
-  PENDDING,
-  OK,
-  NO_OK,
-}
-
-export interface Client {
+export interface MedplayaGuest {
   id: string;
   name: string;
-  lastname: string;
-  username: string;
-  checkin: string;
-  checkout: string;
-  code: string;
-  room: string;
-  status: Status;
-  isActive: true;
-  amount: number;
+  surname1: string;
+  surname2: string;
+  userName: string;
+  dateIn: GuestDate;
+  dateOut: GuestDate;
 }
 
 @Component({
@@ -48,7 +34,7 @@ export interface Client {
   ],
 })
 export class LoginComponent {
-  constructor(private router: Router) {}
+  constructor(private loginService: LoginService) {}
   userProfileForm = new FormGroup({
     username: new FormControl(''),
     checkInDate: new FormControl(''),
@@ -60,126 +46,9 @@ export class LoginComponent {
     const checkinDate = value.checkInDate;
 
     if (username && checkinDate) {
-      await this.login(username, checkinDate);
+      await this.loginService.login(username, checkinDate);
     } else {
       alert('All fields needed');
     }
-  }
-
-  private async login(
-    username: string,
-    checkinDate: string
-  ): Promise<Client | void> {
-    try {
-      const query: Query = {
-        query: {
-          where: {
-            username,
-          },
-        },
-      };
-      const response = await fetch(
-        'http://localhost:8080/medplaya/client/find',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(query),
-        }
-      );
-
-      if (response.status === 404) {
-        alert('El usuario no existe');
-        return;
-      }
-      if (response.status === 500) {
-        alert('Error en el servidor');
-        return;
-      }
-
-      const client = (await response.json()) as Client;
-      this.validateClientLogin(client, checkinDate);
-      return client;
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
-
-  private marshallCheckinDateFromDatabase = (
-    stringCheckinDate: string
-  ): Date => {
-    const marshaledCheckin = new Date(stringCheckinDate.slice(0, 10).trim());
-    marshaledCheckin.setHours(0), marshaledCheckin.setMinutes(0);
-    marshaledCheckin.setSeconds(0);
-    marshaledCheckin.setMilliseconds(0);
-
-    return marshaledCheckin;
-  };
-
-  private marshallCheckoutDateFromDatabase = (
-    stringCheckoutDate: string
-  ): Date => {
-    const marshaledCheckout = new Date(stringCheckoutDate.slice(0, 10).trim());
-    marshaledCheckout.setHours(0), marshaledCheckout.setMinutes(0);
-    marshaledCheckout.setSeconds(0);
-    marshaledCheckout.setMilliseconds(0);
-
-    return marshaledCheckout;
-  };
-
-  private buildEarlyLoginLimit(marshaledCheckinDate: Date): Date {
-    const limit = new Date(marshaledCheckinDate.getTime());
-    limit.setDate(marshaledCheckinDate.getDate() - 3);
-    return limit;
-  }
-
-  private buildLatelyLoginLimit(marshaledCheckoutDate: Date): Date {
-    const limit = new Date(marshaledCheckoutDate.getTime());
-    limit.setDate(marshaledCheckoutDate.getDate() + 1);
-    return limit;
-  }
-
-  private buildToday(): Date {
-    const today = new Date();
-    today.setHours(0);
-    today.setMinutes(0);
-    today.setSeconds(0);
-    today.setMilliseconds(0);
-
-    return today;
-  }
-
-  private validateClientLogin(client: Client, checkinDate: string): void {
-    const marshaledCheckin = this.marshallCheckinDateFromDatabase(
-      client.checkin
-    );
-    const marshaledCheckout = this.marshallCheckoutDateFromDatabase(
-      client.checkout
-    );
-    const earlyLoginLimit = this.buildEarlyLoginLimit(marshaledCheckin);
-    const latelyLoginLimit = this.buildLatelyLoginLimit(marshaledCheckout);
-
-    if (marshaledCheckin.getTime() === new Date(checkinDate).getTime()) {
-      const todayDate = this.buildToday();
-
-      if (todayDate.getTime() < earlyLoginLimit.getTime()) {
-        alert('Access denied, too early');
-        return;
-      } else if (todayDate.getTime() > latelyLoginLimit.getTime()) {
-        alert('Access denied, too late');
-        return;
-      } else {
-        this.navigateToChat(client.id);
-      }
-    } else {
-      alert('Wrong check in date');
-      return;
-    }
-  }
-
-  private navigateToChat(clientId: string) {
-    return this.router.navigate([`chat/${clientId}`]);
   }
 }

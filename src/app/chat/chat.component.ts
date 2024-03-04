@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
 import { getUserById } from '../helpers/get-user-by-id';
-import { Client } from '../login/login.component';
+import { MedplayaGuest } from '../login/login.component';
 
 interface ChatResponse {
   chatMessage: string;
@@ -26,7 +26,7 @@ interface CreateMessageCommand {
   id: string;
   question: string;
   chatResponse: string;
-  clientId: string;
+  guestId: string;
 }
 
 type messageAuthor = 'user' | 'chat-gpt';
@@ -62,8 +62,8 @@ export class ChatComponent implements OnInit {
 
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
-  private clientId: string | null = null;
-  public client: Client | undefined;
+  private guestId: string | null = null;
+  public guest: MedplayaGuest | undefined;
   public showSpinner: boolean = false;
 
   recognition: any;
@@ -83,10 +83,10 @@ export class ChatComponent implements OnInit {
   async ngOnInit() {
     this.router.paramMap
       .pipe(filter((param) => param.has('id')))
-      .subscribe((param) => (this.clientId = param.get('id')));
+      .subscribe((param) => (this.guestId = param.get('id')));
 
-    if (this.clientId) {
-      this.client = await getUserById(this.clientId);
+    if (this.guestId) {
+      this.guest = await getUserById(this.guestId);
     }
   }
 
@@ -94,7 +94,7 @@ export class ChatComponent implements OnInit {
     try {
       const userMessage = this.messageInput.value;
 
-      if (this.clientId && userMessage) {
+      if (this.guestId && userMessage) {
         this.scrollToBottom();
 
         this.chatMessages.push(this.buildChatMessage('user', userMessage));
@@ -119,7 +119,7 @@ export class ChatComponent implements OnInit {
         const chatMessage = chatResponseData.chatMessage;
         const createMessageCommand: CreateMessageCommand =
           this.buildCreateMessageCommand(
-            this.clientId,
+            this.guestId,
             userMessage,
             chatMessage
           );
@@ -185,7 +185,7 @@ export class ChatComponent implements OnInit {
       id: crypto.randomUUID(),
       question: customQuestion ? customQuestion : question,
       chatResponse: customChatResponse ? customChatResponse : chatResponse,
-      clientId,
+      guestId: clientId,
     };
   }
 
