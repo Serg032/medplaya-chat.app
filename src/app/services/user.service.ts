@@ -1,6 +1,7 @@
-import { Injectable, input } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MedplayaGuest } from '../login/login.component';
+import { jwtDecode } from 'jwt-decode';
 
 interface Query {
   username: string;
@@ -11,10 +12,32 @@ export interface LoginResponse {
   guest: MedplayaGuest;
 }
 
+interface Token {
+  guestId: { _value: string };
+  username: { _value: string };
+}
+
+export interface GetUserByIdresponse {
+  id: 'string';
+  name: 'string';
+  surname1: 'string';
+  surname2: 'string';
+  userName: 'string';
+  dateIn: 'string';
+  dateOut: 'string';
+  bookingId: 'string';
+  roomNumber: number;
+  guestNumber: number;
+  regime: 'FULL';
+  createdAt: 'string';
+  updatedAt: 'string';
+  deletedAt: 'string';
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class LoginService {
+export class UserService {
   constructor(private router: Router) {}
 
   public async login(
@@ -47,6 +70,9 @@ export class LoginService {
 
       const loginResponse = (await dataFetched.json()) as LoginResponse;
       this.validateClientLogin(loginResponse.guest, checkinDate);
+      localStorage.setItem('accessToken', loginResponse.accessToken.toString());
+
+      console.log(loginResponse.guest);
       return {
         accessToken: loginResponse.accessToken,
         guest: loginResponse.guest,
@@ -57,13 +83,6 @@ export class LoginService {
   }
 
   private validateClientLogin(guest: MedplayaGuest, checkinDate: string): void {
-    // const marshaledCheckin = this.marshallCheckinDateFromDatabase(
-    //   String(guest.dateIn)
-    // );
-    // const marshaledCheckout = this.marshallCheckoutDateFromDatabase(
-    //   String(guest.dateOut)
-    // );
-
     const guestDateIn = guest.dateIn._value;
     const guestDateOut = guest.dateOut._value;
     const inputCheckin = new Date(checkinDate);
@@ -81,14 +100,6 @@ export class LoginService {
     const earlyLoginLimit = this.buildEarlyLoginLimit(new Date(guestDateIn));
     const latelyLoginLimit = this.buildLatelyLoginLimit(new Date(guestDateOut));
 
-    console.log(
-      'checkin',
-      databaseCheckin,
-      'input checkin',
-      inputCheckin,
-      databaseCheckin.getTime() === inputCheckin.getTime()
-    );
-
     if (databaseCheckin.getTime() === inputCheckin.getTime()) {
       const todayDate = this.buildToday();
 
@@ -99,35 +110,13 @@ export class LoginService {
         alert('Access denied, too late');
         return;
       } else {
-        this.navigateToChat(guest.id);
+        this.navigateToChat(guest.id._value);
       }
     } else {
       alert('Wrong check in date');
       return;
     }
   }
-
-  private marshallCheckinDateFromDatabase = (
-    stringCheckinDate: string
-  ): Date => {
-    const marshaledCheckin = new Date(stringCheckinDate.slice(0, 10).trim());
-    marshaledCheckin.setHours(0), marshaledCheckin.setMinutes(0);
-    marshaledCheckin.setSeconds(0);
-    marshaledCheckin.setMilliseconds(0);
-
-    return marshaledCheckin;
-  };
-
-  private marshallCheckoutDateFromDatabase = (
-    stringCheckoutDate: string
-  ): Date => {
-    const marshaledCheckout = new Date(stringCheckoutDate.slice(0, 10).trim());
-    marshaledCheckout.setHours(0), marshaledCheckout.setMinutes(0);
-    marshaledCheckout.setSeconds(0);
-    marshaledCheckout.setMilliseconds(0);
-
-    return marshaledCheckout;
-  };
 
   private buildEarlyLoginLimit(marshaledCheckinDate: Date): Date {
     const limit = new Date(marshaledCheckinDate.getTime());
@@ -154,4 +143,38 @@ export class LoginService {
   private navigateToChat(clientId: string) {
     return this.router.navigate([`chat/${clientId}`]);
   }
+
+  private navigateToLogin() {
+    return this.router.navigate([``]);
+  }
+
+  public validateAuth(guest: GetUserByIdresponse, accessToken?: string) {
+    if (!accessToken) {
+      this.navigateToLogin();
+    } else {
+      const decodedToken: Token = jwtDecode(accessToken);
+      if (
+        !accessToken ||
+        guest.id !== decodedToken.guestId._value ||
+        guest.userName !== decodedToken.username._value
+      ) {
+        this.navigateToLogin();
+      }
+    }
+  }
+
+  public getGuestById = async (
+    id: string
+  ): Promise<GetUserByIdresponse | undefined> => {
+    const response = await fetch(
+      `http://localhost:8080/medplaya/guest/find/${id}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return (await response.json()) as GetUserByIdresponse;
+  };
 }

@@ -4,18 +4,25 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { LoginService } from '../services/login.service';
+import { UserService } from '../services/user.service';
 
+interface GuestId {
+  _value: string;
+}
+
+interface GuestUsername {
+  _value: string;
+}
 interface GuestDate {
   _value: string;
 }
 
 export interface MedplayaGuest {
-  id: string;
+  id: GuestId;
   name: string;
   surname1: string;
   surname2: string;
-  userName: string;
+  userName: GuestUsername;
   dateIn: GuestDate;
   dateOut: GuestDate;
 }
@@ -34,7 +41,7 @@ export interface MedplayaGuest {
   ],
 })
 export class LoginComponent {
-  constructor(private loginService: LoginService) {}
+  constructor(private loginService: UserService) {}
   userProfileForm = new FormGroup({
     username: new FormControl(''),
     checkInDate: new FormControl(''),

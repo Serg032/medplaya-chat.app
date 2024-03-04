@@ -9,8 +9,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
-import { getUserById } from '../helpers/get-user-by-id';
 import { MedplayaGuest } from '../login/login.component';
+import { GetUserByIdresponse, UserService } from '../services/user.service';
 
 interface ChatResponse {
   chatMessage: string;
@@ -63,7 +63,7 @@ export class ChatComponent implements OnInit {
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
   private guestId: string | null = null;
-  public guest: MedplayaGuest | undefined;
+  public guest: GetUserByIdresponse | undefined;
   public showSpinner: boolean = false;
 
   recognition: any;
@@ -71,7 +71,10 @@ export class ChatComponent implements OnInit {
 
   public messageHour = new Date().getHours();
 
-  constructor(private router: ActivatedRoute) {
+  constructor(
+    private router: ActivatedRoute,
+    private userService: UserService
+  ) {
     this.recognition = new webkitSpeechRecognition();
     this.recognition.lang = 'es-ES';
     this.recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -83,11 +86,24 @@ export class ChatComponent implements OnInit {
   async ngOnInit() {
     this.router.paramMap
       .pipe(filter((param) => param.has('id')))
-      .subscribe((param) => (this.guestId = param.get('id')));
+      .subscribe(async (param) => {
+        this.guestId = param.get('id');
+        if (this.guestId) {
+          this.guest = await this.userService.getGuestById(this.guestId);
+        }
+        console.log(this.guest);
+        if (this.guest) {
+          const guest = this.guest;
+          console.log('GUESSSST');
 
-    if (this.guestId) {
-      this.guest = await getUserById(this.guestId);
-    }
+          guest
+            ? this.userService.validateAuth(
+                guest,
+                localStorage.getItem('accessToken') as string
+              )
+            : console.log('No guest');
+        }
+      });
   }
 
   public async sendMessage() {
