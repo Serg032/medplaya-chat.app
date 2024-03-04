@@ -10,6 +10,9 @@ import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
 import { GetUserByIdresponse, UserService } from '../services/user.service';
+import { ExpansionPanel } from '../ui/expansion-panel/expansion-panel.component';
+import { CustomMenu } from '../ui/menu/menu.component';
+import { DrawerComponent } from '../ui/drawer/drawer.component';
 
 interface ChatResponse {
   chatMessage: string;
@@ -54,6 +57,9 @@ declare var webkitSpeechRecognition: any;
     MatCardModule,
     CommonModule,
     Spinner,
+    ExpansionPanel,
+    CustomMenu,
+    DrawerComponent,
   ],
 })
 export class ChatComponent implements OnInit {
