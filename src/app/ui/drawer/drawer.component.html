@@ -2,11 +2,10 @@
   <mat-drawer class="drawer-container" #drawer>
     <h4>Conversations</h4>
     <ul></ul>
-    <div class="languajes"></div>
   </mat-drawer>
   <mat-drawer-content>
     <div class="header">
-      <div>
+      <div class="h-div">
         <button mat-flat-button (click)="drawer.toggle()">
           <mat-icon
             aria-hidden="false"
@@ -15,7 +14,7 @@
           ></mat-icon>
         </button>
       </div>
-      <div>
+      <div class="h-div">
         <span
           ><b>{{ guestName }}</b>
         </span>

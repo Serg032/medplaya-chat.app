@@ -16,6 +16,11 @@
   width: 100%;
 }
 
+.h-div {
+  width: 6rem;
+  text-align: center;
+}
+
 mat-drawer-content {
   padding: 12px;
   display: flex;

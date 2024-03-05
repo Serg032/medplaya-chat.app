@@ -9,9 +9,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
-import { GetUserByIdresponse, UserService } from '../services/user.service';
-import { ExpansionPanel } from '../ui/expansion-panel/expansion-panel.component';
-import { CustomMenu } from '../ui/menu/menu.component';
+import {
+  GetUserByIdresponse as GetUserByIdResponse,
+  UserService,
+} from '../services/user.service';
 import { DrawerComponent } from '../ui/drawer/drawer.component';
 
 interface ChatResponse {
@@ -57,8 +58,6 @@ declare var webkitSpeechRecognition: any;
     MatCardModule,
     CommonModule,
     Spinner,
-    ExpansionPanel,
-    CustomMenu,
     DrawerComponent,
   ],
 })
@@ -68,9 +67,10 @@ export class ChatComponent implements OnInit {
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
   private guestId: string | null = null;
-  public guest: GetUserByIdresponse | undefined;
+  public guest: GetUserByIdResponse | undefined;
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
+  public recordLanguaje = '';
 
   recognition: any;
   recognizedText: string = '';
@@ -94,7 +94,6 @@ export class ChatComponent implements OnInit {
         );
       };
     }
-    console.log('NAvigator', this.isFirefox);
     this.router.paramMap
       .pipe(filter((param) => param.has('id')))
       .subscribe(async (param) => {

@@ -25,7 +25,7 @@
   background-color: white;
   position: absolute;
   top: 3.8rem;
-  bottom: 8rem;
+  bottom: 7rem;
   right: 0;
   left: 0;
   z-index: 10;
@@ -33,6 +33,7 @@
   border-bottom-right-radius: 6%;
   width: 100%;
   padding-bottom: 2rem;
+  padding-top: 2rem;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 8px;
 }
 

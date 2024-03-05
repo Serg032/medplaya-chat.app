@@ -4,6 +4,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 
 /** @title Drawer with explicit backdrop setting */
 @Component({
@@ -17,14 +18,13 @@ import { MatIconModule } from '@angular/material/icon';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
   ],
 })
 export class DrawerComponent {
-  @Input() changeLanguaje: () => void;
   @Input() guestName: string | undefined;
 
   constructor() {
-    this.changeLanguaje = () => {};
     this.guestName = '';
   }
 }
