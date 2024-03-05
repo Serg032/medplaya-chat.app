@@ -1,15 +1,15 @@
-<drawer>
+<drawer [guestName]="buildGuestNameDisplay()">
   <div class="main-container">
     <div class="spinner-container" *ngIf="showSpinner">
       <spinner></spinner>
     </div>
-    <div class="header-container">
+    <!-- <div class="header-container">
       <h3 *ngIf="guest">
         {{ guest.name + " " + guest.surname1 }}
       </h3>
       <h3 *ngIf="!guest">CloudIA</h3>
-      <custom-menu></custom-menu>
-    </div>
+       <custom-menu></custom-menu> 
+    </div> -->
     <div class="main-container">
       <div class="spinner-container" *ngIf="showSpinner">
         <spinner></spinner>

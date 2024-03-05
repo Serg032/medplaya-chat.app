@@ -230,4 +230,12 @@ export class ChatComponent implements OnInit {
   stopRecognition() {
     this.recognition.stop();
   }
+
+  public buildGuestNameDisplay(): string {
+    if (this.guest) {
+      return this.guest.name + ' ' + this.guest.surname1;
+    }
+
+    return 'CloudIA';
+  }
 }

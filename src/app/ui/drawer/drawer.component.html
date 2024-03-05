@@ -1,12 +1,25 @@
 <mat-drawer-container class="example-container" [hasBackdrop]="true">
-  <mat-drawer #drawer>
+  <mat-drawer class="drawer-container" #drawer>
     <h4>Conversations</h4>
     <ul></ul>
     <div class="languajes"></div>
   </mat-drawer>
   <mat-drawer-content>
     <div class="header">
-      <button mat-raised-button (click)="drawer.toggle()">Toggle drawer</button>
+      <div>
+        <button mat-flat-button (click)="drawer.toggle()">
+          <mat-icon
+            aria-hidden="false"
+            aria-label="Burguer Menu"
+            fontIcon="menu"
+          ></mat-icon>
+        </button>
+      </div>
+      <div>
+        <span
+          ><b>{{ guestName }}</b>
+        </span>
+      </div>
     </div>
     <ng-content></ng-content>
   </mat-drawer-content>

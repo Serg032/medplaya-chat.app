@@ -24,7 +24,7 @@
   align-items: center;
   background-color: white;
   position: absolute;
-  top: 2.8rem;
+  top: 3.8rem;
   bottom: 8rem;
   right: 0;
   left: 0;
@@ -81,7 +81,7 @@
   align-items: end;
   justify-content: center;
   gap: 1rem;
-  padding-bottom: 2rem;
+  padding-bottom: 1.5rem;
 }
 
 .input-and-buttons-container {

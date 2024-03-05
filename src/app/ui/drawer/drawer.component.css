@@ -5,6 +5,17 @@
   /* border: 1px solid #555; */
 }
 
+.drawer-container {
+  min-width: 15rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 mat-drawer-content {
   padding: 12px;
   display: flex;
