@@ -25,7 +25,7 @@
   background-color: white;
   position: absolute;
   top: 2.8rem;
-  bottom: 6rem;
+  bottom: 8rem;
   right: 0;
   left: 0;
   z-index: 10;
@@ -71,6 +71,8 @@
 .input-container {
   position: absolute;
   bottom: 0;
+  left: 0;
+  right: 0;
   height: 8rem;
   display: flex;
   width: 100%;
@@ -79,6 +81,7 @@
   align-items: end;
   justify-content: center;
   gap: 1rem;
+  padding-bottom: 2rem;
 }
 
 .input-and-buttons-container {

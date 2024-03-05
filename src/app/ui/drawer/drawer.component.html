@@ -1,25 +1,13 @@
-<mat-drawer-container
-  class="example-container"
-  [hasBackdrop]="hasBackdrop.value"
->
-  <mat-drawer #drawer [mode]="mode.value">I'm a drawer</mat-drawer>
+<mat-drawer-container class="example-container" [hasBackdrop]="true">
+  <mat-drawer #drawer>
+    <h4>Conversations</h4>
+    <ul></ul>
+    <div class="languajes"></div>
+  </mat-drawer>
   <mat-drawer-content>
-    <mat-form-field>
-      <mat-label>Sidenav mode</mat-label>
-      <mat-select #mode value="side">
-        <mat-option value="side">Side</mat-option>
-        <mat-option value="over">Over</mat-option>
-        <mat-option value="push">Push</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Has backdrop</mat-label>
-      <mat-select #hasBackdrop>
-        <mat-option>Unset</mat-option>
-        <mat-option [value]="true">True</mat-option>
-        <mat-option [value]="false">False</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <button mat-raised-button (click)="drawer.toggle()">Toggle drawer</button>
+    <div class="header">
+      <button mat-raised-button (click)="drawer.toggle()">Toggle drawer</button>
+    </div>
+    <ng-content></ng-content>
   </mat-drawer-content>
 </mat-drawer-container>

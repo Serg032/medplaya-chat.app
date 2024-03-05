@@ -1,50 +1,54 @@
-<!-- <div class="main-container">
-  <div class="spinner-container" *ngIf="showSpinner">
-    <spinner></spinner>
-  </div>
-  <div class="header-container">
-    <h3 *ngIf="guest">
-      {{ guest.name + " " + guest.surname1 }}
-    </h3>
-    <h3 *ngIf="!guest">CloudIA</h3>
-    <custom-menu></custom-menu>
-  </div>
+<drawer>
   <div class="main-container">
     <div class="spinner-container" *ngIf="showSpinner">
       <spinner></spinner>
     </div>
-    <div class="messages-container" #messagesContainer>
-      <div class="card-container" *ngFor="let chatMessage of chatMessages">
-        <mat-card
-          class="message-container"
-          [ngClass]="{
-            'user-message': chatMessage.author === 'user',
-            'chat-message': chatMessage.author === 'chat-gpt'
-          }"
-        >
-          <mat-card-content>
-            <span
-              ><b>{{ chatMessage.message }}</b></span
-            >
-          </mat-card-content>
-        </mat-card>
-        <span>{{ chatMessage.hour }}</span>
-      </div>
+    <div class="header-container">
+      <h3 *ngIf="guest">
+        {{ guest.name + " " + guest.surname1 }}
+      </h3>
+      <h3 *ngIf="!guest">CloudIA</h3>
+      <custom-menu></custom-menu>
     </div>
-    <div class="input-container">
-      <div class="input-and-buttons-container">
-        <input [formControl]="messageInput" />
-        <div class="icons-container">
-          <button type="submit" (click)="sendMessage()">
-            <img class="icon" src="../../assets/send.svg" alt="send-icon" />
-          </button>
-          <button *ngIf="!isFirefox" type="submit" (click)="startRecognition()">
-            <img class="icon" src="../../assets/record.svg" alt="send-icon" />
-          </button>
+    <div class="main-container">
+      <div class="spinner-container" *ngIf="showSpinner">
+        <spinner></spinner>
+      </div>
+      <div class="messages-container" #messagesContainer>
+        <div class="card-container" *ngFor="let chatMessage of chatMessages">
+          <mat-card
+            class="message-container"
+            [ngClass]="{
+              'user-message': chatMessage.author === 'user',
+              'chat-message': chatMessage.author === 'chat-gpt'
+            }"
+          >
+            <mat-card-content>
+              <span
+                ><b>{{ chatMessage.message }}</b></span
+              >
+            </mat-card-content>
+          </mat-card>
+          <span>{{ chatMessage.hour }}</span>
+        </div>
+      </div>
+      <div class="input-container">
+        <div class="input-and-buttons-container">
+          <input [formControl]="messageInput" />
+          <div class="icons-container">
+            <button type="submit" (click)="sendMessage()">
+              <img class="icon" src="../../assets/send.svg" alt="send-icon" />
+            </button>
+            <button
+              *ngIf="!isFirefox"
+              type="submit"
+              (click)="startRecognition()"
+            >
+              <img class="icon" src="../../assets/record.svg" alt="send-icon" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div> -->
-
-<drawer></drawer>
+</drawer>
