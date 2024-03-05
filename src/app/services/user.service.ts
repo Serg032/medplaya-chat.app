@@ -17,21 +17,23 @@ interface Token {
   username: { _value: string };
 }
 
-export interface GetUserByIdresponse {
-  id: 'string';
-  name: 'string';
-  surname1: 'string';
-  surname2: 'string';
-  userName: 'string';
-  dateIn: 'string';
-  dateOut: 'string';
-  bookingId: 'string';
+export type Regime = 'FULL' | 'STANDARD' | 'BASIC';
+
+export interface GetUserByIdResponse {
+  id: string;
+  name: string;
+  surname1: string;
+  surname2: string;
+  userName: string;
+  dateIn: string;
+  dateOut: string;
+  bookingId: string;
   roomNumber: number;
   guestNumber: number;
-  regime: 'FULL';
-  createdAt: 'string';
-  updatedAt: 'string';
-  deletedAt: 'string';
+  regime: Regime;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 }
 
 @Injectable({
@@ -148,7 +150,7 @@ export class UserService {
     return this.router.navigate([``]);
   }
 
-  public validateAuth(guest: GetUserByIdresponse, accessToken?: string) {
+  public validateAuth(guest: GetUserByIdResponse, accessToken?: string) {
     if (!accessToken) {
       this.navigateToLogin();
     } else {
@@ -165,7 +167,7 @@ export class UserService {
 
   public getGuestById = async (
     id: string
-  ): Promise<GetUserByIdresponse | undefined> => {
+  ): Promise<GetUserByIdResponse | undefined> => {
     const response = await fetch(
       `http://localhost:8080/medplaya/guest/find/${id}`,
       {
@@ -175,6 +177,6 @@ export class UserService {
         },
       }
     );
-    return (await response.json()) as GetUserByIdresponse;
+    return (await response.json()) as GetUserByIdResponse;
   };
 }

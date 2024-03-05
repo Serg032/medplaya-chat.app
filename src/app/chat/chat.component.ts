@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
 import {
-  GetUserByIdresponse as GetUserByIdResponse,
+  GetUserByIdResponse as GetUserByIdResponse,
   UserService,
 } from '../services/user.service';
 import { DrawerComponent } from '../ui/drawer/drawer.component';
