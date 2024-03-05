@@ -1,12 +1,24 @@
 <mat-drawer-container class="example-container" [hasBackdrop]="true">
   <mat-drawer class="drawer-container" #drawer>
-    <h4>Conversations</h4>
-    <ul *ngIf="conversations">
-      <li *ngFor="let conversation of conversations">
-        {{ conversation.createdAt }}
-      </li>
-    </ul>
-    <span *ngIf="conversations.length === 0">No conversations</span>
+    <div class="add-conversation">
+      <button mat-flat-button (click)="createConversation()">
+        <mat-icon
+          aria-hidden="false"
+          aria-label="add"
+          fontIcon="add"
+        ></mat-icon>
+        <span><b>create conversation</b></span>
+      </button>
+    </div>
+    <div class="convarsations-container">
+      <h4>Conversations</h4>
+      <ul *ngIf="conversations">
+        <li *ngFor="let conversation of conversations">
+          {{ conversation.createdAt }}
+        </li>
+      </ul>
+      <span *ngIf="conversations.length === 0">No conversations</span>
+    </div>
   </mat-drawer>
   <mat-drawer-content>
     <div class="header">

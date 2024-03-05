@@ -119,9 +119,12 @@ export class ChatComponent implements OnInit {
             await this.conversationService.getConversationsByGuestId(
               this.guestId
             );
-          conversationsByGuestId.map((conversation) =>
-            this.conversations.push(conversation)
-          );
+          if (conversationsByGuestId.length > 0) {
+            conversationsByGuestId.map((conversation) =>
+              this.conversations.push(conversation)
+            );
+          }
+
           console.log('Conversations', this.conversations);
         }
       });

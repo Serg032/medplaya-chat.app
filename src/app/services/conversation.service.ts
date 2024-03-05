@@ -9,6 +9,10 @@ export interface ConversationByQuery {
   deletedAt: string;
 }
 
+export interface CreateConversationCommand {
+  guestId: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,6 +20,9 @@ export class ConversationService {
   private rootUrl = 'http://localhost:8080/medplaya';
   private getConversationsUrl = `${this.rootUrl}/conversations/get`;
   private createConversationsUrl = `${this.rootUrl}/conversation/create`;
+  private headers = {
+    'Content-Type': 'application/json',
+  };
   constructor() {}
   public async getConversationsByGuestId(
     guestId: string
@@ -27,6 +34,23 @@ export class ConversationService {
           where: {
             guestId,
           },
+        }),
+      });
+
+      return (await dataFetched.json()) as ConversationByQuery[] | [];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async createConversation(command: CreateConversationCommand) {
+    try {
+      const dataFetched = await fetch(this.createConversationsUrl, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify({
+          id: crypto.randomUUID(),
+          guestId: command.guestId,
         }),
       });
 
