@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GetUserByIdResponse } from './user.service';
 
-interface ConversationByQuery {
+export interface ConversationByQuery {
   id: string;
   guestId: GetUserByIdResponse[];
   createdAt: string;
@@ -14,14 +14,14 @@ interface ConversationByQuery {
 })
 export class ConversationService {
   private rootUrl = 'http://localhost:8080/medplaya';
-  private findConversationsUrl = `${this.rootUrl}/conversation/find`;
+  private getConversationsUrl = `${this.rootUrl}/conversations/get`;
   private createConversationsUrl = `${this.rootUrl}/conversation/create`;
   constructor() {}
-  public async getConversationsByGuest(
+  public async getConversationsByGuestId(
     guestId: string
-  ): Promise<ConversationByQuery | undefined> {
+  ): Promise<ConversationByQuery[] | []> {
     try {
-      const dataFetched = await fetch(this.findConversationsUrl, {
+      const dataFetched = await fetch(this.getConversationsUrl, {
         method: 'POST',
         body: JSON.stringify({
           where: {
@@ -30,7 +30,7 @@ export class ConversationService {
         }),
       });
 
-      return (await dataFetched.json()) as ConversationByQuery | undefined;
+      return (await dataFetched.json()) as ConversationByQuery[] | [];
     } catch (error) {
       throw error;
     }

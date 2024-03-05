@@ -5,6 +5,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { ConversationByQuery } from '../../services/conversation.service';
+import { CommonModule } from '@angular/common';
 
 /** @title Drawer with explicit backdrop setting */
 @Component({
@@ -19,12 +21,15 @@ import { MatMenuModule } from '@angular/material/menu';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    CommonModule,
   ],
 })
 export class DrawerComponent {
   @Input() guestName: string | undefined;
+  @Input() conversations: ConversationByQuery[];
 
   constructor() {
     this.guestName = '';
+    this.conversations = [];
   }
 }

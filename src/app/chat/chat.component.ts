@@ -14,6 +14,10 @@ import {
   UserService,
 } from '../services/user.service';
 import { DrawerComponent } from '../ui/drawer/drawer.component';
+import {
+  ConversationByQuery,
+  ConversationService,
+} from '../services/conversation.service';
 
 interface ChatResponse {
   chatMessage: string;
@@ -70,7 +74,7 @@ export class ChatComponent implements OnInit {
   public guest: GetUserByIdResponse | undefined;
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
-  public recordLanguaje = '';
+  public conversations: ConversationByQuery[] = [];
 
   recognition: any;
   recognizedText: string = '';
@@ -79,7 +83,8 @@ export class ChatComponent implements OnInit {
 
   constructor(
     private router: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private conversationService: ConversationService
   ) {}
 
   async ngOnInit() {
@@ -101,17 +106,23 @@ export class ChatComponent implements OnInit {
         if (this.guestId) {
           this.guest = await this.userService.getGuestById(this.guestId);
         }
-        console.log(this.guest);
-        if (this.guest) {
+        if (this.guest && this.guestId) {
           const guest = this.guest;
-          console.log('GUESSSST');
-
           guest
             ? this.userService.validateAuth(
                 guest,
                 localStorage.getItem('accessToken') as string
               )
             : console.log('No guest');
+
+          const conversationsByGuestId =
+            await this.conversationService.getConversationsByGuestId(
+              this.guestId
+            );
+          conversationsByGuestId.map((conversation) =>
+            this.conversations.push(conversation)
+          );
+          console.log('Conversations', this.conversations);
         }
       });
   }

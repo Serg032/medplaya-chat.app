@@ -1,7 +1,12 @@
 <mat-drawer-container class="example-container" [hasBackdrop]="true">
   <mat-drawer class="drawer-container" #drawer>
     <h4>Conversations</h4>
-    <ul></ul>
+    <ul *ngIf="conversations">
+      <li *ngFor="let conversation of conversations">
+        {{ conversation.createdAt }}
+      </li>
+    </ul>
+    <span *ngIf="conversations.length === 0">No conversations</span>
   </mat-drawer>
   <mat-drawer-content>
     <div class="header">
