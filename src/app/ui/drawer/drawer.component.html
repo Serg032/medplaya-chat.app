@@ -14,7 +14,13 @@
       <h4>Conversations</h4>
       <ul *ngIf="conversations">
         <li *ngFor="let conversation of conversations">
-          {{ conversation.createdAt }}
+          <button
+            mat-flat-button
+            (click)="changeCurrentConversation()"
+            (click)="drawer.toggle()"
+          >
+            {{ conversation.createdAt }}
+          </button>
         </li>
       </ul>
       <span *ngIf="conversations.length === 0">No conversations</span>

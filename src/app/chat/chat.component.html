@@ -1,21 +1,55 @@
-<drawer
-  [guestName]="buildGuestNameDisplay()"
-  [conversations]="conversations"
-  [createConversation]="createConversationFunction"
->
-  <div class="main-container">
-    <div class="spinner-container" *ngIf="showSpinner">
-      <spinner></spinner>
+<mat-drawer-container class="example-container" [hasBackdrop]="true">
+  <mat-drawer class="drawer-container" #drawer>
+    <div class="add-conversation">
+      <button mat-flat-button (click)="createConversationFunction()">
+        <mat-icon
+          aria-hidden="false"
+          aria-label="add"
+          fontIcon="add"
+        ></mat-icon>
+        <span><b>Create conversation</b></span>
+      </button>
+    </div>
+    <div class="convarsations-container">
+      <h4>Conversations</h4>
+      <ul *ngIf="conversations">
+        <li *ngFor="let conversation of conversations">
+          <button
+            mat-flat-button
+            (click)="updateCurrentConversatio(conversation)"
+            (click)="drawer.toggle()"
+          >
+            {{ conversation.id }}
+          </button>
+        </li>
+      </ul>
+      <span *ngIf="conversations.length === 0">No conversations</span>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content>
+    <div class="header">
+      <div class="h-div">
+        <button mat-flat-button (click)="drawer.toggle()">
+          <mat-icon
+            aria-hidden="false"
+            aria-label="Burguer Menu"
+            fontIcon="menu"
+          ></mat-icon>
+        </button>
+      </div>
+      <div class="h-div">
+        <span
+          ><b>{{ buildGuestNameDisplay() }}</b>
+        </span>
+      </div>
     </div>
     <div class="main-container">
       <div class="spinner-container" *ngIf="showSpinner">
         <spinner></spinner>
       </div>
       <div class="messages-container" #messagesContainer>
-        <span *ngIf="currentConversation">{{
-          currentConversation.createdAt!
-        }}</span>
-        <!-- <div class="card-container" *ngFor="let chatMessage of chatMessages">
+        <span *ngIf="currentConversation">{{ currentConversation.id }}</span>
+        <div class="card-container" *ngFor="let chatMessage of chatMessages">
           <mat-card
             class="message-container"
             [ngClass]="{
@@ -30,13 +64,13 @@
             </mat-card-content>
           </mat-card>
           <span>{{ chatMessage.hour }}</span>
-        </div> -->
+        </div>
       </div>
       <div class="input-container">
         <div class="input-and-buttons-container">
           <input [formControl]="messageInput" />
           <div class="icons-container">
-            <button type="submit" (click)="(sendMessage)">
+            <button type="submit" (click)="sendMessage()">
               <img class="icon" src="../../assets/send.svg" alt="send-icon" />
             </button>
             <button
@@ -50,5 +84,5 @@
         </div>
       </div>
     </div>
-  </div>
-</drawer>
+  </mat-drawer-content>
+</mat-drawer-container>

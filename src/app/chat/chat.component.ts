@@ -1,4 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,19 +15,15 @@ import {
   GetUserByIdResponse as GetUserByIdResponse,
   UserService,
 } from '../services/user.service';
-import { DrawerComponent } from '../ui/drawer/drawer.component';
 import {
   ConversationByQuery,
   ConversationService,
 } from '../services/conversation.service';
 import {
+  ChatResponse,
   CreateMessageCommand,
   MessageService,
 } from '../services/message.service';
-
-interface ChatResponse {
-  chatMessage: string;
-}
 
 interface ChatMessage {
   author: string;
@@ -59,7 +57,8 @@ declare var webkitSpeechRecognition: any;
     MatCardModule,
     CommonModule,
     Spinner,
-    DrawerComponent,
+    MatSidenavModule,
+    MatCheckboxModule,
   ],
 })
 export class ChatComponent implements OnInit {
@@ -68,7 +67,7 @@ export class ChatComponent implements OnInit {
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
   private guestId: string | null = null;
-  private guest: GetUserByIdResponse | undefined;
+  public guest: GetUserByIdResponse | undefined;
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
   public conversations: ConversationByQuery[] = [];
@@ -88,6 +87,11 @@ export class ChatComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    console.log(
+      await this.messageService.getMessagesByConversationId(
+        this.currentConversation?.id!
+      )
+    );
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
       this.recognition = new webkitSpeechRecognition();
@@ -152,11 +156,94 @@ export class ChatComponent implements OnInit {
     }
   }
 
+  public updateCurrentConversatio(convesation: ConversationByQuery) {
+    console.log('Click on a conversation: ', convesation);
+
+    this.currentConversation = convesation;
+  }
+
   public async sendMessage() {
-    // return await this.messageService.createMessage({
-    //   id: randomUUID(),
-    //   conversationId:
-    // })
+    const guestQuestion = this.messageInput.value;
+    this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 0);
+    this.messageInput.setValue('');
+    this.showSpinner = true;
+
+    const chatResponse: ChatResponse | undefined =
+      await this.messageService.sendQuestionToAssistant(guestQuestion);
+
+    if (chatResponse?.chatMessage && this.currentConversation) {
+      console.log('Chat Response', chatResponse);
+      this.chatMessages.push(
+        this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
+      );
+
+      const createdMessageResponse = await this.messageService.createMessage(
+        this.buildCreateMessageCommand(
+          this.currentConversation.id,
+          guestQuestion,
+          chatResponse.chatMessage
+        )
+      );
+      if (createdMessageResponse.statusCode === 201) {
+        this.showSpinner = false;
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, 0);
+      }
+    } else {
+      alert('Something went wrong');
+      return;
+    }
+  }
+
+  private buildChatMessage(
+    author: messageAuthor,
+    message: string
+  ): ChatMessage {
+    const rootDate = new Date();
+    const hour = rootDate.getHours();
+    const minutes =
+      rootDate.getMinutes().toString().length === 1
+        ? `0${rootDate.getMinutes()}`
+        : rootDate.getMinutes();
+    const hourString = `${hour.toString()}:${minutes.toString()} `;
+    return {
+      author,
+      message,
+      hour: hourString,
+    };
+  }
+
+  private buildCreateMessageCommand(
+    conversationId: string,
+    question: string,
+    chatResponse: string
+  ): CreateMessageCommand {
+    let customChatResponse;
+    let customQuestion;
+    if (chatResponse.length > 255) {
+      customChatResponse = chatResponse.slice(0, 200);
+    }
+    if (question.length > 255) {
+      customQuestion = question.slice(0, 200);
+    }
+
+    return {
+      id: crypto.randomUUID(),
+      question: customQuestion ? customQuestion : question,
+      chatResponse: customChatResponse ? customChatResponse : chatResponse,
+      conversationId: conversationId,
+    };
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.messagesContainer.nativeElement.scrollTop =
+        this.messagesContainer.nativeElement.scrollHeight;
+    } catch (err) {}
   }
 
   startRecognition() {
@@ -184,9 +271,9 @@ export class ChatComponent implements OnInit {
 //       this.scrollToBottom();
 
 //       this.chatMessages.push(this.buildChatMessage('user', userMessage));
-//       setTimeout(() => {
-//         this.scrollToBottom();
-//       }, 0);
+// setTimeout(() => {
+//   this.scrollToBottom();
+// }, 0);
 //       this.messageInput.setValue('');
 //       this.showSpinner = true;
 
@@ -223,24 +310,6 @@ export class ChatComponent implements OnInit {
 //   } catch (error) {
 //     console.log(error);
 //   }
-// }
-
-// private buildChatMessage(
-//   author: messageAuthor,
-//   message: string
-// ): ChatMessage {
-//   const rootDate = new Date();
-//   const hour = rootDate.getHours();
-//   const minutes =
-//     rootDate.getMinutes().toString().length === 1
-//       ? `0${rootDate.getMinutes()}`
-//       : rootDate.getMinutes();
-//   const hourString = `${hour.toString()}:${minutes.toString()} `;
-//   return {
-//     author,
-//     message,
-//     hour: hourString,
-//   };
 // }
 
 // private async sendCreatedMessage(command: CreateMessageCommand) {

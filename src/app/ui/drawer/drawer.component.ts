@@ -28,10 +28,12 @@ export class DrawerComponent {
   @Input() guestName: string | undefined;
   @Input() conversations: ConversationByQuery[];
   @Input() createConversation: any;
+  @Input() changeCurrentConversation: any;
 
   constructor() {
     this.guestName = '';
     this.conversations = [];
-    this.createConversation = async () => [];
+    this.createConversation = async () => {};
+    this.changeCurrentConversation = () => {};
   }
 }
