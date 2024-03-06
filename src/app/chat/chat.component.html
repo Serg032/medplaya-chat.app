@@ -1,4 +1,8 @@
-<drawer [guestName]="buildGuestNameDisplay()" guestId="guestId">
+<drawer
+  [guestName]="buildGuestNameDisplay()"
+  [conversations]="conversations"
+  [createConversation]="createConversationFunction"
+>
   <div class="main-container">
     <div class="spinner-container" *ngIf="showSpinner">
       <spinner></spinner>

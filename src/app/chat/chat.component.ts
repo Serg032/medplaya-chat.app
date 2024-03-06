@@ -70,11 +70,12 @@ export class ChatComponent implements OnInit {
 
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
-  private guestId: string | null = null;
+  public guestId: string | null = null;
   public guest: GetUserByIdResponse | undefined;
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
   public conversations: ConversationByQuery[] = [];
+  public createConversationFunction: any;
 
   recognition: any;
   recognizedText: string = '';
@@ -103,8 +104,14 @@ export class ChatComponent implements OnInit {
       .pipe(filter((param) => param.has('id')))
       .subscribe(async (param) => {
         this.guestId = param.get('id');
-        if (this.guestId) {
+        if (this.guestId !== null) {
+          console.log('INIT', this.guestId);
           this.guest = await this.userService.getGuestById(this.guestId);
+          this.createConversationFunction = async () => {
+            await this.conversationService.createConversation({
+              guestId: this.guestId!,
+            });
+          };
         }
         if (this.guest && this.guestId) {
           const guest = this.guest;
