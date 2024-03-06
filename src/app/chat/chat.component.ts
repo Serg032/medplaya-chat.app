@@ -75,7 +75,7 @@ export class ChatComponent implements OnInit {
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
   public conversations: ConversationByQuery[] = [];
-  public createConversationFunction: any;
+  public createConversationFunction: any; // Function to create conversation
 
   recognition: any;
   recognizedText: string = '';
@@ -105,7 +105,6 @@ export class ChatComponent implements OnInit {
       .subscribe(async (param) => {
         this.guestId = param.get('id');
         if (this.guestId !== null) {
-          console.log('INIT', this.guestId);
           this.guest = await this.userService.getGuestById(this.guestId);
           this.createConversationFunction = async () => {
             await this.conversationService.createConversation({
