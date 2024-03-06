@@ -1,10 +1,20 @@
 import { Injectable } from '@angular/core';
 
-interface CreateMessageCommand {
+export interface CreateMessageCommand {
   id: string;
   question: string;
   chatResponse: string;
   conversationId: string;
+}
+
+interface SuccessCreatefullyResponse {
+  statusCode: 201;
+  message: 'Message successfully created';
+}
+
+interface FailedCreateResponse {
+  statusCode: 400 | 500;
+  message: 'Something went wrong' | 'Internal server error';
 }
 
 @Injectable({
@@ -20,15 +30,32 @@ export class MessageService {
 
   constructor() {}
 
-  async createMessage(command: CreateMessageCommand) {
+  async createMessage(
+    command: CreateMessageCommand
+  ): Promise<SuccessCreatefullyResponse | FailedCreateResponse> {
     try {
-      const data = await fetch(this.createMessageUrl, {
+      const response = await fetch(this.createMessageUrl, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify(command),
       });
 
-      return await data.json();
-    } catch (error) {}
+      if (response.ok) {
+        return {
+          statusCode: 201,
+          message: 'Message successfully created',
+        };
+      } else {
+        return {
+          statusCode: 400,
+          message: 'Something went wrong',
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: 500,
+        message: 'Internal server error',
+      };
+    }
   }
 }

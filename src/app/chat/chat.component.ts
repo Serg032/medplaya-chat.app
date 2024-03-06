@@ -18,6 +18,10 @@ import {
   ConversationByQuery,
   ConversationService,
 } from '../services/conversation.service';
+import {
+  CreateMessageCommand,
+  MessageService,
+} from '../services/message.service';
 
 interface ChatResponse {
   chatMessage: string;
@@ -27,13 +31,6 @@ interface ChatMessage {
   author: string;
   message: string;
   hour: string;
-}
-
-interface CreateMessageCommand {
-  id: string;
-  question: string;
-  chatResponse: string;
-  guestId: string;
 }
 
 type messageAuthor = 'user' | 'chat-gpt';
@@ -70,12 +67,13 @@ export class ChatComponent implements OnInit {
 
   public messageInput = new FormControl();
   public chatMessages: ChatMessage[] = [];
-  public guestId: string | null = null;
-  public guest: GetUserByIdResponse | undefined;
+  private guestId: string | null = null;
+  private guest: GetUserByIdResponse | undefined;
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
   public conversations: ConversationByQuery[] = [];
   public createConversationFunction: any; // Function to create conversation
+  public currentConversation: ConversationByQuery | undefined;
 
   recognition: any;
   recognizedText: string = '';
@@ -85,7 +83,8 @@ export class ChatComponent implements OnInit {
   constructor(
     private router: ActivatedRoute,
     private userService: UserService,
-    private conversationService: ConversationService
+    private conversationService: ConversationService,
+    private messageService: MessageService
   ) {}
 
   async ngOnInit() {
@@ -110,6 +109,15 @@ export class ChatComponent implements OnInit {
             await this.conversationService.createConversation({
               guestId: this.guestId!,
             });
+
+            this.conversations =
+              await this.conversationService.getConversationsByGuestId(
+                this.guestId!
+              );
+
+            this.currentConversation = this.getLastConversation();
+
+            console.log('current Conversation', this.currentConversation);
           };
         }
         if (this.guest && this.guestId) {
@@ -121,125 +129,34 @@ export class ChatComponent implements OnInit {
               )
             : console.log('No guest');
 
-          const conversationsByGuestId =
+          this.conversations =
             await this.conversationService.getConversationsByGuestId(
               this.guestId
             );
-          if (conversationsByGuestId.length > 0) {
-            conversationsByGuestId.map((conversation) =>
-              this.conversations.push(conversation)
-            );
-          }
 
-          console.log('Conversations', this.conversations);
+          this.currentConversation = this.getLastConversation();
+          console.log('current Conversation', this.currentConversation);
         }
       });
   }
 
+  public getLastConversation(): ConversationByQuery | undefined {
+    if (this.conversations.length > 0) {
+      return this.conversations.sort((a, b) => {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      })[0];
+    } else {
+      return undefined;
+    }
+  }
+
   public async sendMessage() {
-    try {
-      const userMessage = this.messageInput.value;
-
-      if (this.guestId && userMessage) {
-        this.scrollToBottom();
-
-        this.chatMessages.push(this.buildChatMessage('user', userMessage));
-        setTimeout(() => {
-          this.scrollToBottom();
-        }, 0);
-        this.messageInput.setValue('');
-        this.showSpinner = true;
-
-        const chatResponse = await fetch('http://localhost:3000', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: userMessage }),
-        });
-        if (!chatResponse.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const chatResponseData: ChatResponse = await chatResponse.json();
-
-        const chatMessage = chatResponseData.chatMessage;
-        const createMessageCommand: CreateMessageCommand =
-          this.buildCreateMessageCommand(
-            this.guestId,
-            userMessage,
-            chatMessage
-          );
-        await this.sendCreatedMessage(createMessageCommand);
-        this.showSpinner = false;
-        this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
-        setTimeout(() => {
-          this.scrollToBottom();
-        }, 0);
-      } else if (!userMessage) {
-        alert('Theres no message');
-      } else {
-        alert('theres no client id');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  private buildChatMessage(
-    author: messageAuthor,
-    message: string
-  ): ChatMessage {
-    const rootDate = new Date();
-    const hour = rootDate.getHours();
-    const minutes =
-      rootDate.getMinutes().toString().length === 1
-        ? `0${rootDate.getMinutes()}`
-        : rootDate.getMinutes();
-    const hourString = `${hour.toString()}:${minutes.toString()} `;
-    return {
-      author,
-      message,
-      hour: hourString,
-    };
-  }
-
-  private async sendCreatedMessage(command: CreateMessageCommand) {
-    await fetch('http://localhost:8080/medplaya/message/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(command),
-    });
-  }
-
-  private buildCreateMessageCommand(
-    clientId: string,
-    question: string,
-    chatResponse: string
-  ): CreateMessageCommand {
-    let customChatResponse;
-    let customQuestion;
-    if (chatResponse.length > 255) {
-      customChatResponse = chatResponse.slice(0, 200);
-    }
-    if (question.length > 255) {
-      customQuestion = question.slice(0, 200);
-    }
-
-    return {
-      id: crypto.randomUUID(),
-      question: customQuestion ? customQuestion : question,
-      chatResponse: customChatResponse ? customChatResponse : chatResponse,
-      guestId: clientId,
-    };
-  }
-
-  private scrollToBottom(): void {
-    try {
-      this.messagesContainer.nativeElement.scrollTop =
-        this.messagesContainer.nativeElement.scrollHeight;
-    } catch (err) {}
+    // return await this.messageService.createMessage({
+    //   id: randomUUID(),
+    //   conversationId:
+    // })
   }
 
   startRecognition() {
@@ -258,3 +175,103 @@ export class ChatComponent implements OnInit {
     return 'CloudIA';
   }
 }
+
+// public async sendMessage() {
+//   try {
+//     const userMessage = this.messageInput.value;
+
+//     if (this.guestId && userMessage) {
+//       this.scrollToBottom();
+
+//       this.chatMessages.push(this.buildChatMessage('user', userMessage));
+//       setTimeout(() => {
+//         this.scrollToBottom();
+//       }, 0);
+//       this.messageInput.setValue('');
+//       this.showSpinner = true;
+
+//       const chatResponse = await fetch('http://localhost:3000', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ message: userMessage }),
+//       });
+//       if (!chatResponse.ok) {
+//         throw new Error('Network response was not ok');
+//       }
+//       const chatResponseData: ChatResponse = await chatResponse.json();
+
+//       const chatMessage = chatResponseData.chatMessage;
+//       const createMessageCommand: CreateMessageCommand =
+//         this.buildCreateMessageCommand(
+//           this.guestId,
+//           userMessage,
+//           chatMessage
+//         );
+//       await this.sendCreatedMessage(createMessageCommand);
+//       this.showSpinner = false;
+//       this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
+//       setTimeout(() => {
+//         this.scrollToBottom();
+//       }, 0);
+//     } else if (!userMessage) {
+//       alert('Theres no message');
+//     } else {
+//       alert('theres no client id');
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+// private buildChatMessage(
+//   author: messageAuthor,
+//   message: string
+// ): ChatMessage {
+//   const rootDate = new Date();
+//   const hour = rootDate.getHours();
+//   const minutes =
+//     rootDate.getMinutes().toString().length === 1
+//       ? `0${rootDate.getMinutes()}`
+//       : rootDate.getMinutes();
+//   const hourString = `${hour.toString()}:${minutes.toString()} `;
+//   return {
+//     author,
+//     message,
+//     hour: hourString,
+//   };
+// }
+
+// private async sendCreatedMessage(command: CreateMessageCommand) {
+//   return this.messageService.createMessage(command);
+// }
+
+// private buildCreateMessageCommand(
+//   conversationId: string,
+//   question: string,
+//   chatResponse: string
+// ): CreateMessageCommand {
+//   let customChatResponse;
+//   let customQuestion;
+//   if (chatResponse.length > 255) {
+//     customChatResponse = chatResponse.slice(0, 200);
+//   }
+//   if (question.length > 255) {
+//     customQuestion = question.slice(0, 200);
+//   }
+
+//   return {
+//     id: crypto.randomUUID(),
+//     question: customQuestion ? customQuestion : question,
+//     chatResponse: customChatResponse ? customChatResponse : chatResponse,
+//     conversationId: conversationId,
+//   };
+// }
+
+// private scrollToBottom(): void {
+//   try {
+//     this.messagesContainer.nativeElement.scrollTop =
+//       this.messagesContainer.nativeElement.scrollHeight;
+//   } catch (err) {}
+// }
