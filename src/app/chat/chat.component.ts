@@ -167,24 +167,14 @@ export class ChatComponent implements OnInit {
   }
 
   public async sendMessage() {
-    const guestQuestion = this.messageInput.value;
-    console.log('AAAAAA', guestQuestion);
     if (!this.currentConversation) {
-      // console.log('No current conversation', this.currentConversation);
-      console.log(
-        this.currentConversation,
-        this.chatMessages,
-        'message input',
-        this.messageInput
-      );
       this.createConversationFunction();
       setTimeout(() => {
-        this.sendMessageOperative(guestQuestion);
+        this.sendMessageOperative(this.messageInput.value);
       }, 100);
     } else {
-      console.log('Current conversation', this.currentConversation);
       setTimeout(() => {
-        this.sendMessageOperative(guestQuestion);
+        this.sendMessageOperative(this.messageInput.value);
       }, 100);
     }
   }
