@@ -123,12 +123,14 @@ export class ChatComponent implements OnInit {
               this.guestId!
             );
 
+            console.log('Guest conversations', this.conversations);
+
             this.currentConversation = this.getLastConversation();
+
+            console.log('Guest currentConversation', this.currentConversation);
 
             if (this.currentConversation) {
               this.updateCurrentConversation(this.currentConversation);
-              this.updateCurrentConversation(this.currentConversation);
-              console.log('current Conversation', this.currentConversation);
             }
           };
 
@@ -140,10 +142,7 @@ export class ChatComponent implements OnInit {
 
           if (this.currentConversation) {
             await this.getMessagesFromConversation();
-          } else {
-            console.log('AAA');
           }
-          console.log('current Conversation', this.currentConversation);
         } else {
           console.log('return to login');
         }
@@ -163,18 +162,30 @@ export class ChatComponent implements OnInit {
   }
 
   public async updateCurrentConversation(convesation: ConversationByQuery) {
-    console.log('Click on a conversation: ', convesation);
-
     this.currentConversation = convesation;
     await this.getMessagesFromConversation();
   }
 
   public async sendMessage() {
+    const guestQuestion = this.messageInput.value;
+    console.log('AAAAAA', guestQuestion);
     if (!this.currentConversation) {
+      // console.log('No current conversation', this.currentConversation);
+      console.log(
+        this.currentConversation,
+        this.chatMessages,
+        'message input',
+        this.messageInput
+      );
       this.createConversationFunction();
-      this.sendMessageOperative();
+      setTimeout(() => {
+        this.sendMessageOperative(guestQuestion);
+      }, 100);
     } else {
-      this.sendMessageOperative();
+      console.log('Current conversation', this.currentConversation);
+      setTimeout(() => {
+        this.sendMessageOperative(guestQuestion);
+      }, 100);
     }
   }
 
@@ -220,16 +231,9 @@ export class ChatComponent implements OnInit {
 
   private async getMessagesFromConversation() {
     if (!this.currentConversation) {
-      console.log(
-        'getMessagesFromConversation',
-        'no conversations',
-        this.conversationService
-      );
       return;
     } else {
       this.chatMessages = [];
-      console.log('chat messages after delete', this.chatMessages);
-      console.log('current conversation Id', this.currentConversation.id);
 
       const allMessagesByConversation =
         await this.messageService.getMessagesByConversationId({
@@ -240,10 +244,6 @@ export class ChatComponent implements OnInit {
           },
         });
 
-      console.log(
-        'messages by conversation Id at building',
-        allMessagesByConversation
-      );
       if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
         allMessagesByConversation.map((message) => {
           const databaseMessageToChatMessage =
@@ -252,8 +252,6 @@ export class ChatComponent implements OnInit {
           this.chatMessages.push(databaseMessageToChatMessage.response);
         });
       }
-
-      console.log('chat messages', this.chatMessages);
     }
   }
 
@@ -267,8 +265,8 @@ export class ChatComponent implements OnInit {
     };
   }
 
-  private async sendMessageOperative() {
-    const guestQuestion = this.messageInput.value;
+  private async sendMessageOperative(guestQuestion: string) {
+    console.log('Input at operative', guestQuestion);
     this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
     setTimeout(() => {
       this.scrollToBottom();
@@ -280,7 +278,6 @@ export class ChatComponent implements OnInit {
       await this.messageService.sendQuestionToAssistant(guestQuestion);
 
     if (chatResponse?.chatMessage && this.currentConversation) {
-      console.log('Chat Response', chatResponse);
       this.chatMessages.push(
         this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
       );
@@ -329,8 +326,11 @@ export class ChatComponent implements OnInit {
         ))
       : console.log('go to login');
     this.currentConversation = this.getLastConversation();
+    this.chatMessages = [];
     if (this.currentConversation) {
       this.updateCurrentConversation(this.currentConversation);
+    } else {
+      this.currentConversation = undefined;
     }
   }
 
