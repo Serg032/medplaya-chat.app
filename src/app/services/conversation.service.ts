@@ -18,17 +18,18 @@ export interface CreateConversationCommand {
 })
 export class ConversationService {
   private rootUrl = 'http://localhost:8080/medplaya';
-  private getConversationsUrl = `${this.rootUrl}/conversations/get`;
-  private createConversationsUrl = `${this.rootUrl}/conversation/create`;
+  private getUrl = `${this.rootUrl}/conversations/get`;
+  private createUrl = `${this.rootUrl}/conversation/create`;
+  private deleteUrl = `${this.rootUrl}/conversation/delete`;
   private headers = {
     'Content-Type': 'application/json',
   };
   constructor() {}
-  public async getConversationsByGuestId(
+  public async getByGuestId(
     guestId: string
   ): Promise<ConversationByQuery[] | []> {
     try {
-      const dataFetched = await fetch(this.getConversationsUrl, {
+      const dataFetched = await fetch(this.getUrl, {
         method: 'POST',
         body: JSON.stringify({
           where: {
@@ -43,9 +44,9 @@ export class ConversationService {
     }
   }
 
-  public async createConversation(command: CreateConversationCommand) {
+  public async create(command: CreateConversationCommand) {
     try {
-      const dataFetched = await fetch(this.createConversationsUrl, {
+      const dataFetched = await fetch(this.createUrl, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify({
@@ -55,6 +56,17 @@ export class ConversationService {
       });
 
       return (await dataFetched.json()) as ConversationByQuery[] | [];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async deleteById(id: string) {
+    try {
+      await fetch(`${this.deleteUrl}/${id}`, {
+        method: 'DELETE',
+        headers: this.headers,
+      });
     } catch (error) {
       throw error;
     }

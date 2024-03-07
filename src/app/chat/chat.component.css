@@ -131,7 +131,7 @@ button {
 
 .drawer-container {
   min-width: 15rem;
-  max-width: 17rem;
+  max-width: 20rem;
   height: 100vh;
   padding: 2rem;
   display: flex;
@@ -167,4 +167,11 @@ mat-drawer-content {
   flex-direction: column;
   gap: 0.6rem;
   padding-top: 1rem;
+}
+
+conversation-item {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
 }

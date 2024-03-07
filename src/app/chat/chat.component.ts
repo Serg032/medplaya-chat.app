@@ -25,7 +25,6 @@ import {
   Message,
   MessageService,
 } from '../services/message.service';
-import { tick } from '@angular/core/testing';
 
 interface ChatMessage {
   author: string;
@@ -116,24 +115,26 @@ export class ChatComponent implements OnInit {
             : console.log('No guest');
 
           this.createConversationFunction = async () => {
-            await this.conversationService.createConversation({
+            await this.conversationService.create({
               guestId: this.guestId!,
             });
 
-            this.conversations =
-              await this.conversationService.getConversationsByGuestId(
-                this.guestId!
-              );
+            this.conversations = await this.conversationService.getByGuestId(
+              this.guestId!
+            );
 
             this.currentConversation = this.getLastConversation();
 
-            console.log('current Conversation', this.currentConversation);
+            if (this.currentConversation) {
+              this.updateCurrentConversation(this.currentConversation);
+              this.updateCurrentConversation(this.currentConversation);
+              console.log('current Conversation', this.currentConversation);
+            }
           };
 
-          this.conversations =
-            await this.conversationService.getConversationsByGuestId(
-              this.guestId
-            );
+          this.conversations = await this.conversationService.getByGuestId(
+            this.guestId
+          );
 
           this.currentConversation = this.getLastConversation();
 
@@ -169,39 +170,11 @@ export class ChatComponent implements OnInit {
   }
 
   public async sendMessage() {
-    const guestQuestion = this.messageInput.value;
-    this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
-    setTimeout(() => {
-      this.scrollToBottom();
-    }, 0);
-    this.messageInput.setValue('');
-    this.showSpinner = true;
-
-    const chatResponse: ChatResponse | undefined =
-      await this.messageService.sendQuestionToAssistant(guestQuestion);
-
-    if (chatResponse?.chatMessage && this.currentConversation) {
-      console.log('Chat Response', chatResponse);
-      this.chatMessages.push(
-        this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
-      );
-
-      const createdMessageResponse = await this.messageService.createMessage(
-        this.buildCreateMessageCommand(
-          this.currentConversation.id,
-          guestQuestion,
-          chatResponse.chatMessage
-        )
-      );
-      if (createdMessageResponse.statusCode === 201) {
-        this.showSpinner = false;
-        setTimeout(() => {
-          this.scrollToBottom();
-        }, 0);
-      }
+    if (!this.currentConversation) {
+      this.createConversationFunction();
+      this.sendMessageOperative();
     } else {
-      alert('Something went wrong');
-      return;
+      this.sendMessageOperative();
     }
   }
 
@@ -292,6 +265,73 @@ export class ChatComponent implements OnInit {
       question: this.buildChatMessage('user', databaseMessage.question),
       response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
     };
+  }
+
+  private async sendMessageOperative() {
+    const guestQuestion = this.messageInput.value;
+    this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 0);
+    this.messageInput.setValue('');
+    this.showSpinner = true;
+
+    const chatResponse: ChatResponse | undefined =
+      await this.messageService.sendQuestionToAssistant(guestQuestion);
+
+    if (chatResponse?.chatMessage && this.currentConversation) {
+      console.log('Chat Response', chatResponse);
+      this.chatMessages.push(
+        this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
+      );
+
+      const createdMessageResponse = await this.messageService.createMessage(
+        this.buildCreateMessageCommand(
+          this.currentConversation.id,
+          guestQuestion,
+          chatResponse.chatMessage
+        )
+      );
+      if (createdMessageResponse.statusCode === 201) {
+        this.showSpinner = false;
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, 0);
+      }
+    } else {
+      alert('Something went wrong');
+      return;
+    }
+  }
+
+  public async buildConversationTitle(conversationId: string): Promise<string> {
+    const converstaionMessages =
+      await this.messageService.getMessagesByConversationId({
+        query: {
+          where: {
+            conversationId,
+          },
+        },
+      });
+
+    if (converstaionMessages && converstaionMessages.length > 0) {
+      return converstaionMessages[0].question;
+    } else {
+      return 'Still no message';
+    }
+  }
+
+  public async deleteConversation(conversationId: string) {
+    await this.conversationService.deleteById(conversationId);
+    this.guestId
+      ? (this.conversations = await this.conversationService.getByGuestId(
+          this.guestId
+        ))
+      : console.log('go to login');
+    this.currentConversation = this.getLastConversation();
+    if (this.currentConversation) {
+      this.updateCurrentConversation(this.currentConversation);
+    }
   }
 
   private scrollToBottom(): void {

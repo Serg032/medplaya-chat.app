@@ -1,7 +1,11 @@
 <mat-drawer-container class="example-container" [hasBackdrop]="true">
   <mat-drawer class="drawer-container" #drawer>
     <div class="add-conversation">
-      <button mat-flat-button (click)="createConversationFunction()">
+      <button
+        mat-flat-button
+        (click)="createConversationFunction()"
+        (click)="drawer.toggle()"
+      >
         <mat-icon
           aria-hidden="false"
           aria-label="add"
@@ -13,13 +17,27 @@
     <div class="convarsations-container">
       <h4>Conversations</h4>
       <ul *ngIf="conversations" class="conversations-list">
-        <li *ngFor="let conversation of conversations">
+        <li
+          *ngFor="let conversation of conversations"
+          class="conversation-item"
+        >
           <button
             mat-stroked-button
             (click)="updateCurrentConversation(conversation)"
             (click)="drawer.toggle()"
           >
-            {{ conversation.id }}
+            {{ conversation.createdAt }}
+          </button>
+          <button
+            mat-flat-button
+            (click)="deleteConversation(conversation.id)"
+            (click)="drawer.toggle()"
+          >
+            <mat-icon
+              aria-hidden="false"
+              aria-label="delete"
+              fontIcon="delete"
+            ></mat-icon>
           </button>
         </li>
       </ul>
