@@ -16,7 +16,7 @@
         <li *ngFor="let conversation of conversations">
           <button
             mat-stroked-button
-            (click)="updateCurrentConversatio(conversation)"
+            (click)="updateCurrentConversation(conversation)"
             (click)="drawer.toggle()"
           >
             {{ conversation.id }}
@@ -56,6 +56,7 @@
               'user-message': chatMessage.author === 'user',
               'chat-message': chatMessage.author === 'chat-gpt'
             }"
+            *ngIf="chatMessages.length > 0"
           >
             <mat-card-content>
               <span

@@ -161,10 +161,11 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  public updateCurrentConversatio(convesation: ConversationByQuery) {
+  public async updateCurrentConversation(convesation: ConversationByQuery) {
     console.log('Click on a conversation: ', convesation);
 
     this.currentConversation = convesation;
+    await this.getMessagesFromConversation();
   }
 
   public async sendMessage() {
@@ -253,10 +254,23 @@ export class ChatComponent implements OnInit {
       );
       return;
     } else {
+      this.chatMessages = [];
+      console.log('chat messages after delete', this.chatMessages);
+      console.log('current conversation Id', this.currentConversation.id);
+
       const allMessagesByConversation =
-        await this.messageService.getMessagesByConversationId(
-          this.currentConversation.id
-        );
+        await this.messageService.getMessagesByConversationId({
+          query: {
+            where: {
+              conversationId: this.currentConversation.id,
+            },
+          },
+        });
+
+      console.log(
+        'messages by conversation Id at building',
+        allMessagesByConversation
+      );
       if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
         allMessagesByConversation.map((message) => {
           const databaseMessageToChatMessage =

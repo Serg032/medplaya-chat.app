@@ -41,6 +41,14 @@ export interface CreateMessageCommand {
   conversationId: string;
 }
 
+interface GetMessagesByConversationIdQuery {
+  query: {
+    where: {
+      conversationId: string;
+    };
+  };
+}
+
 export interface ChatResponse {
   chatMessage: string;
 }
@@ -120,16 +128,12 @@ export class MessageService {
   }
 
   public async getMessagesByConversationId(
-    conversationId: string
+    query: GetMessagesByConversationIdQuery
   ): Promise<Message[] | [] | undefined> {
     const response = await fetch(this.getMessagesUrl, {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify({
-        where: {
-          conversationId,
-        },
-      }),
+      body: JSON.stringify(query),
     });
 
     if (!response.ok) {
