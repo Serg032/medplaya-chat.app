@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Regime } from './user.service';
 
-interface Message {
+export interface Message {
   id: string;
   question: string;
   chatResponse: string;
@@ -121,7 +121,7 @@ export class MessageService {
 
   public async getMessagesByConversationId(
     conversationId: string
-  ): Promise<Message[] | undefined> {
+  ): Promise<Message[] | [] | undefined> {
     const response = await fetch(this.getMessagesUrl, {
       method: 'POST',
       headers: this.headers,

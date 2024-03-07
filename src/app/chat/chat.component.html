@@ -12,10 +12,10 @@
     </div>
     <div class="convarsations-container">
       <h4>Conversations</h4>
-      <ul *ngIf="conversations">
+      <ul *ngIf="conversations" class="conversations-list">
         <li *ngFor="let conversation of conversations">
           <button
-            mat-flat-button
+            mat-stroked-button
             (click)="updateCurrentConversatio(conversation)"
             (click)="drawer.toggle()"
           >

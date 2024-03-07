@@ -22,8 +22,10 @@ import {
 import {
   ChatResponse,
   CreateMessageCommand,
+  Message,
   MessageService,
 } from '../services/message.service';
+import { tick } from '@angular/core/testing';
 
 interface ChatMessage {
   author: string;
@@ -87,11 +89,6 @@ export class ChatComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    console.log(
-      await this.messageService.getMessagesByConversationId(
-        this.currentConversation?.id!
-      )
-    );
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
       this.recognition = new webkitSpeechRecognition();
@@ -109,6 +106,15 @@ export class ChatComponent implements OnInit {
         this.guestId = param.get('id');
         if (this.guestId !== null) {
           this.guest = await this.userService.getGuestById(this.guestId);
+
+          const guest = this.guest;
+          guest
+            ? this.userService.validateAuth(
+                guest,
+                localStorage.getItem('accessToken') as string
+              )
+            : console.log('No guest');
+
           this.createConversationFunction = async () => {
             await this.conversationService.createConversation({
               guestId: this.guestId!,
@@ -123,15 +129,6 @@ export class ChatComponent implements OnInit {
 
             console.log('current Conversation', this.currentConversation);
           };
-        }
-        if (this.guest && this.guestId) {
-          const guest = this.guest;
-          guest
-            ? this.userService.validateAuth(
-                guest,
-                localStorage.getItem('accessToken') as string
-              )
-            : console.log('No guest');
 
           this.conversations =
             await this.conversationService.getConversationsByGuestId(
@@ -139,7 +136,15 @@ export class ChatComponent implements OnInit {
             );
 
           this.currentConversation = this.getLastConversation();
+
+          if (this.currentConversation) {
+            await this.getMessagesFromConversation();
+          } else {
+            console.log('AAA');
+          }
           console.log('current Conversation', this.currentConversation);
+        } else {
+          console.log('return to login');
         }
       });
   }
@@ -239,6 +244,42 @@ export class ChatComponent implements OnInit {
     };
   }
 
+  private async getMessagesFromConversation() {
+    if (!this.currentConversation) {
+      console.log(
+        'getMessagesFromConversation',
+        'no conversations',
+        this.conversationService
+      );
+      return;
+    } else {
+      const allMessagesByConversation =
+        await this.messageService.getMessagesByConversationId(
+          this.currentConversation.id
+        );
+      if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
+        allMessagesByConversation.map((message) => {
+          const databaseMessageToChatMessage =
+            this.buildChatMessageFromDatabaseMessage(message);
+          this.chatMessages.push(databaseMessageToChatMessage.question);
+          this.chatMessages.push(databaseMessageToChatMessage.response);
+        });
+      }
+
+      console.log('chat messages', this.chatMessages);
+    }
+  }
+
+  private buildChatMessageFromDatabaseMessage(databaseMessage: Message): {
+    question: ChatMessage;
+    response: ChatMessage;
+  } {
+    return {
+      question: this.buildChatMessage('user', databaseMessage.question),
+      response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
+    };
+  }
+
   private scrollToBottom(): void {
     try {
       this.messagesContainer.nativeElement.scrollTop =
@@ -262,85 +303,3 @@ export class ChatComponent implements OnInit {
     return 'CloudIA';
   }
 }
-
-// public async sendMessage() {
-//   try {
-//     const userMessage = this.messageInput.value;
-
-//     if (this.guestId && userMessage) {
-//       this.scrollToBottom();
-
-//       this.chatMessages.push(this.buildChatMessage('user', userMessage));
-// setTimeout(() => {
-//   this.scrollToBottom();
-// }, 0);
-//       this.messageInput.setValue('');
-//       this.showSpinner = true;
-
-//       const chatResponse = await fetch('http://localhost:3000', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ message: userMessage }),
-//       });
-//       if (!chatResponse.ok) {
-//         throw new Error('Network response was not ok');
-//       }
-//       const chatResponseData: ChatResponse = await chatResponse.json();
-
-//       const chatMessage = chatResponseData.chatMessage;
-//       const createMessageCommand: CreateMessageCommand =
-//         this.buildCreateMessageCommand(
-//           this.guestId,
-//           userMessage,
-//           chatMessage
-//         );
-//       await this.sendCreatedMessage(createMessageCommand);
-//       this.showSpinner = false;
-//       this.chatMessages.push(this.buildChatMessage('chat-gpt', chatMessage));
-//       setTimeout(() => {
-//         this.scrollToBottom();
-//       }, 0);
-//     } else if (!userMessage) {
-//       alert('Theres no message');
-//     } else {
-//       alert('theres no client id');
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// private async sendCreatedMessage(command: CreateMessageCommand) {
-//   return this.messageService.createMessage(command);
-// }
-
-// private buildCreateMessageCommand(
-//   conversationId: string,
-//   question: string,
-//   chatResponse: string
-// ): CreateMessageCommand {
-//   let customChatResponse;
-//   let customQuestion;
-//   if (chatResponse.length > 255) {
-//     customChatResponse = chatResponse.slice(0, 200);
-//   }
-//   if (question.length > 255) {
-//     customQuestion = question.slice(0, 200);
-//   }
-
-//   return {
-//     id: crypto.randomUUID(),
-//     question: customQuestion ? customQuestion : question,
-//     chatResponse: customChatResponse ? customChatResponse : chatResponse,
-//     conversationId: conversationId,
-//   };
-// }
-
-// private scrollToBottom(): void {
-//   try {
-//     this.messagesContainer.nativeElement.scrollTop =
-//       this.messagesContainer.nativeElement.scrollHeight;
-//   } catch (err) {}
-// }
