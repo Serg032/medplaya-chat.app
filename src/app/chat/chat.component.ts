@@ -165,15 +165,12 @@ export class ChatComponent implements OnInit {
 
   public async sendMessage() {
     if (!this.currentConversation) {
-      this.createConversationFunction();
-      setTimeout(() => {
-        this.sendMessageOperative(this.messageInput.value);
-      }, 100);
-    } else {
-      setTimeout(() => {
-        this.sendMessageOperative(this.messageInput.value);
-      }, 100);
+      await this.createConversationFunction();
+
+      await this.sendMessageOperative(this.messageInput.value);
+      return;
     }
+    await this.sendMessageOperative(this.messageInput.value);
   }
 
   private buildChatMessage(
@@ -193,12 +190,6 @@ export class ChatComponent implements OnInit {
   ): CreateMessageCommand {
     let customChatResponse;
     let customQuestion;
-    if (chatResponse.length > 255) {
-      customChatResponse = chatResponse.slice(0, 200);
-    }
-    if (question.length > 255) {
-      customQuestion = question.slice(0, 200);
-    }
 
     return {
       id: crypto.randomUUID(),
