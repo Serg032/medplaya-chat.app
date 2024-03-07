@@ -8,7 +8,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { Spinner } from '../ui/spinner/spinner.component';
 import {
@@ -73,6 +73,7 @@ export class ChatComponent implements OnInit {
   public conversations: ConversationByQuery[] = [];
   public createConversationFunction: any; // Function to create conversation
   public currentConversation: ConversationByQuery | undefined;
+  private accessToken = 'accessToken';
 
   recognition: any;
   recognizedText: string = '';
@@ -81,6 +82,7 @@ export class ChatComponent implements OnInit {
 
   constructor(
     private router: ActivatedRoute,
+    private routerNavigator: Router,
     private userService: UserService,
     private conversationService: ConversationService,
     private messageService: MessageService
@@ -109,9 +111,9 @@ export class ChatComponent implements OnInit {
           guest
             ? this.userService.validateAuth(
                 guest,
-                localStorage.getItem('accessToken') as string
+                localStorage.getItem(this.accessToken) as string
               )
-            : console.log('No guest');
+            : this.routerNavigator.navigate(['']);
 
           this.createConversationFunction = async () => {
             await this.conversationService.create({
@@ -139,7 +141,7 @@ export class ChatComponent implements OnInit {
             await this.getMessagesFromConversation();
           }
         } else {
-          console.log('return to login');
+          this.routerNavigator.navigate(['']);
         }
       });
   }
@@ -301,7 +303,7 @@ export class ChatComponent implements OnInit {
       ? (this.conversations = await this.conversationService.getByGuestId(
           this.guestId
         ))
-      : console.log('go to login');
+      : this.routerNavigator.navigate(['']);
     this.currentConversation = this.getLastConversation();
     this.chatMessages = [];
     if (this.currentConversation) {
@@ -316,6 +318,11 @@ export class ChatComponent implements OnInit {
       this.messagesContainer.nativeElement.scrollTop =
         this.messagesContainer.nativeElement.scrollHeight;
     } catch (err) {}
+  }
+
+  public logout() {
+    localStorage.removeItem(this.accessToken);
+    this.routerNavigator.navigate(['']);
   }
 
   startRecognition() {
