@@ -169,9 +169,13 @@ mat-drawer-content {
   padding-top: 1rem;
 }
 
-conversation-item {
+.icon-button {
+  width: 2rem;
+}
+
+.icon-container {
+  width: 2rem;
   display: flex;
-  flex-direction: row;
-  gap: 1rem;
   align-items: center;
+  justify-content: center;
 }
