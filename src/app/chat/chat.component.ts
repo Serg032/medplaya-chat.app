@@ -29,7 +29,6 @@ import {
 interface ChatMessage {
   author: string;
   message: string;
-  hour: string;
 }
 
 type messageAuthor = 'user' | 'chat-gpt';
@@ -123,11 +122,7 @@ export class ChatComponent implements OnInit {
               this.guestId!
             );
 
-            console.log('Guest conversations', this.conversations);
-
             this.currentConversation = this.getLastConversation();
-
-            console.log('Guest currentConversation', this.currentConversation);
 
             if (this.currentConversation) {
               this.updateCurrentConversation(this.currentConversation);
@@ -183,17 +178,9 @@ export class ChatComponent implements OnInit {
     author: messageAuthor,
     message: string
   ): ChatMessage {
-    const rootDate = new Date();
-    const hour = rootDate.getHours();
-    const minutes =
-      rootDate.getMinutes().toString().length === 1
-        ? `0${rootDate.getMinutes()}`
-        : rootDate.getMinutes();
-    const hourString = `${hour.toString()}:${minutes.toString()} `;
     return {
       author,
       message,
-      hour: hourString,
     };
   }
 
