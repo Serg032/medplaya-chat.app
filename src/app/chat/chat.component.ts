@@ -95,7 +95,7 @@ export class ChatComponent implements OnInit {
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
       this.recognition = new webkitSpeechRecognition();
-      this.recognition.lang = this.speechLanguage;
+      this.recognition.lang = 'en-US';
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
         this.recognizedText = event.results[0][0].transcript;
         this.messageInput.setValue(
@@ -341,13 +341,11 @@ export class ChatComponent implements OnInit {
     }
     switch (lang) {
       case 'en-US':
-        this.speechLanguage = 'en-US';
-        console.log(this.speechLanguage);
+        this.recognition.lang = 'en-US';
         alert('Speech language changed to English');
         break;
       case 'es-ES':
-        this.speechLanguage = 'es-ES';
-        console.log(this.speechLanguage);
+        this.recognition.lang = 'es-ES';
         alert('Speech language changed to Spanish');
         break;
       default:
