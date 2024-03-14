@@ -174,10 +174,6 @@ export class ChatComponent implements OnInit {
             }
           };
 
-          // this.conversations = await this.conversationService.getByGuestId(
-          //   this.guestId
-          // );
-
           this.localStorageConversations = this.getLocalStorageConversations();
 
           this.currentLocalStorageConversation =
@@ -194,10 +190,6 @@ export class ChatComponent implements OnInit {
           if (this.currentLocalStorageConversation) {
             await this.getLocalStorageMessagesFromConversation();
           }
-
-          // if (this.currentDatabaseConversation) {
-          //   this.getMessagesFromDatabaseConversation();
-          // }
         } else {
           this.routerNavigator.navigate(['']);
         }
@@ -232,7 +224,6 @@ export class ChatComponent implements OnInit {
     conversation: ConversationByQuery
   ) {
     this.currentDatabaseConversation = conversation;
-    // await this.getMessagesFromDatabaseConversation();
   }
 
   public async updateLocalStorageCurrentConversation(
@@ -279,32 +270,6 @@ export class ChatComponent implements OnInit {
     };
   }
 
-  // private async getMessagesFromDatabaseConversation() {
-  //   if (!this.currentDatabaseConversation) {
-  //     return;
-  //   } else {
-  //     this.chatMessages = [];
-
-  //     const allMessagesByConversation =
-  //       await this.messageService.getMessagesByConversationId({
-  //         query: {
-  //           where: {
-  //             conversationId: this.currentDatabaseConversation.id,
-  //           },
-  //         },
-  //       });
-
-  //     if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
-  //       allMessagesByConversation.map((message) => {
-  //         const databaseMessageToChatMessage =
-  //           this.buildChatMessageFromDatabaseMessage(message);
-  //         this.chatMessages.push(databaseMessageToChatMessage.question);
-  //         this.chatMessages.push(databaseMessageToChatMessage.response);
-  //       });
-  //     }
-  //   }
-  // }
-
   private async getLocalStorageMessagesFromConversation() {
     if (!this.currentLocalStorageConversation) {
       return;
@@ -315,13 +280,6 @@ export class ChatComponent implements OnInit {
         this.getLocalStorageMessagesByConversationId(
           this.currentLocalStorageConversation.id
         );
-      // await this.messageService.getMessagesByConversationId({
-      //   query: {
-      //     where: {
-      //       conversationId: this.currentLocalStorageConversation.id,
-      //     },
-      //   },
-      // });
 
       if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
         allMessagesByConversation.map((message) => {
@@ -345,16 +303,6 @@ export class ChatComponent implements OnInit {
       response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
     };
   }
-
-  // private buildChatMessageFromDatabaseMessage(databaseMessage: Message): {
-  //   question: ChatMessage;
-  //   response: ChatMessage;
-  // } {
-  //   return {
-  //     question: this.buildChatMessage('user', databaseMessage.question),
-  //     response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
-  //   };
-  // }
 
   private async sendMessageOperative(guestQuestion: string) {
     console.log('Input at operative', guestQuestion);
@@ -440,14 +388,9 @@ export class ChatComponent implements OnInit {
   }
 
   public async deleteConversation(conversationId: string) {
-    // await this.conversationService.deleteById(conversationId)  ;
     this.deleteLocalStorageMessagesByLocalStorageConversationId(conversationId);
     this.deleteLocalStorageConversation(conversationId);
-    // this.guestId
-    //   ? (this.conversations = await this.conversationService.getByGuestId(
-    //       this.guestId
-    //     ))
-    //   : this.routerNavigator.navigate(['']);
+
     this.guestId
       ? (this.localStorageConversations = this.getLocalStorageConversations())
       : this.routerNavigator.navigate(['']);
