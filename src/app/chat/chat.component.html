@@ -16,17 +16,17 @@
     </div>
     <div class="convarsations-container">
       <h4>Conversations</h4>
-      <ul *ngIf="conversations" class="conversations-list">
+      <ul *ngIf="localStorageConversations" class="conversations-list">
         <li
-          *ngFor="let conversation of conversations"
+          *ngFor="let conversation of localStorageConversations"
           class="conversation-item"
         >
           <button
             mat-stroked-button
-            (click)="updateCurrentConversation(conversation)"
+            (click)="updateLocalStorageCurrentConversation(conversation)"
             (click)="drawer.toggle()"
           >
-            {{ conversation.createdAt }}
+            {{ buildConversationTitle(conversation.id) }}
           </button>
           <button
             mat-flat-button
@@ -41,7 +41,9 @@
           </button>
         </li>
       </ul>
-      <span *ngIf="conversations.length === 0">No conversations</span>
+      <span *ngIf="localStorageConversations.length === 0"
+        >No conversations</span
+      >
     </div>
     <div class="lang-selector" *ngIf="!isFirefox">
       <span>Speech language selector</span>

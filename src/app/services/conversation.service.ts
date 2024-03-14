@@ -5,8 +5,8 @@ export interface ConversationByQuery {
   id: string;
   guestId: GetUserByIdResponse[];
   createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
+  // updatedAt: string;
+  // deletedAt: string;
 }
 
 export interface CreateConversationCommand {

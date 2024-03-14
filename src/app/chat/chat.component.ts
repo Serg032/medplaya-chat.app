@@ -22,7 +22,6 @@ import {
 import {
   ChatResponse,
   CreateMessageCommand,
-  Message,
   MessageService,
 } from '../services/message.service';
 
@@ -34,6 +33,28 @@ interface ChatMessage {
 type messageAuthor = 'user' | 'chat-gpt';
 
 type SupporttedLanguages = 'en-US' | 'es-ES';
+
+interface LocalStorageConversation {
+  id: string;
+  guestId: string;
+  createdAt: number;
+}
+
+interface LocalStorageConversations {
+  conversations: LocalStorageConversation[];
+}
+
+interface LocalStoragMessage {
+  id: string;
+  question: string;
+  chatResponse: string;
+  conversationId: string;
+  createdAt: string;
+}
+
+interface LocalStoragMessages {
+  messages: LocalStoragMessage[];
+}
 
 // Asegura que SpeechRecognitionEvent esté disponible globalmente
 declare global {
@@ -72,16 +93,19 @@ export class ChatComponent implements OnInit {
   public guest: GetUserByIdResponse | undefined;
   public showSpinner: boolean = false;
   public isFirefox: boolean = false;
-  public conversations: ConversationByQuery[] = [];
+  public databaseConversations: ConversationByQuery[] = [];
+  public localStorageConversations: LocalStorageConversation[] = [];
   public createConversationFunction: any; // Function to create conversation
-  public currentConversation: ConversationByQuery | undefined;
+  public currentDatabaseConversation: ConversationByQuery | undefined;
+  public currentLocalStorageConversation: LocalStorageConversation | undefined;
   private accessToken = 'accessToken';
+  private conversationsLocalStorageKey = 'conversations';
+  private messagesLocalStorageKey = 'messages';
 
   recognition: any;
   recognizedText: string = '';
 
   public messageHour = new Date().getHours();
-  private speechLanguage: SupporttedLanguages = 'en-US';
 
   constructor(
     private router: ActivatedRoute,
@@ -123,35 +147,66 @@ export class ChatComponent implements OnInit {
               guestId: this.guestId!,
             });
 
-            this.conversations = await this.conversationService.getByGuestId(
-              this.guestId!
-            );
+            this.createLocalStorageConversation(this.guestId!);
 
-            this.currentConversation = this.getLastConversation();
+            this.databaseConversations =
+              await this.conversationService.getByGuestId(this.guestId!);
 
-            if (this.currentConversation) {
-              this.updateCurrentConversation(this.currentConversation);
+            this.localStorageConversations =
+              this.getLocalStorageConversations();
+
+            this.currentDatabaseConversation =
+              this.getLastDatabaseConversation();
+
+            this.currentLocalStorageConversation =
+              this.getLastLocalStorageConversation();
+
+            if (this.currentDatabaseConversation) {
+              this.updateDatabaseCurrentConversation(
+                this.currentDatabaseConversation
+              );
+            }
+
+            if (this.currentLocalStorageConversation) {
+              this.updateLocalStorageCurrentConversation(
+                this.currentLocalStorageConversation
+              );
             }
           };
 
-          this.conversations = await this.conversationService.getByGuestId(
-            this.guestId
-          );
+          // this.conversations = await this.conversationService.getByGuestId(
+          //   this.guestId
+          // );
 
-          this.currentConversation = this.getLastConversation();
+          this.localStorageConversations = this.getLocalStorageConversations();
 
-          if (this.currentConversation) {
-            await this.getMessagesFromConversation();
+          this.currentLocalStorageConversation =
+            this.getLastLocalStorageConversation();
+
+          this.databaseConversations =
+            await this.conversationService.getByGuestId(this.guestId);
+
+          this.currentDatabaseConversation = this.getLastDatabaseConversation();
+
+          this.currentLocalStorageConversation =
+            this.getLastLocalStorageConversation();
+
+          if (this.currentLocalStorageConversation) {
+            await this.getLocalStorageMessagesFromConversation();
           }
+
+          // if (this.currentDatabaseConversation) {
+          //   this.getMessagesFromDatabaseConversation();
+          // }
         } else {
           this.routerNavigator.navigate(['']);
         }
       });
   }
 
-  public getLastConversation(): ConversationByQuery | undefined {
-    if (this.conversations.length > 0) {
-      return this.conversations.sort((a, b) => {
+  public getLastDatabaseConversation(): ConversationByQuery | undefined {
+    if (this.databaseConversations.length > 0) {
+      return this.databaseConversations.sort((a, b) => {
         return (
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
@@ -161,13 +216,35 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  public async updateCurrentConversation(convesation: ConversationByQuery) {
-    this.currentConversation = convesation;
-    await this.getMessagesFromConversation();
+  public getLastLocalStorageConversation():
+    | LocalStorageConversation
+    | undefined {
+    if (this.localStorageConversations.length > 0) {
+      return this.localStorageConversations.sort((a, b) => {
+        return b.createdAt - a.createdAt;
+      })[0];
+    } else {
+      return undefined;
+    }
+  }
+
+  public async updateDatabaseCurrentConversation(
+    conversation: ConversationByQuery
+  ) {
+    this.currentDatabaseConversation = conversation;
+    // await this.getMessagesFromDatabaseConversation();
+  }
+
+  public async updateLocalStorageCurrentConversation(
+    conversation: LocalStorageConversation
+  ) {
+    this.currentLocalStorageConversation = conversation;
+    console.log(conversation.id);
+    await this.getLocalStorageMessagesFromConversation();
   }
 
   public async sendMessage() {
-    if (!this.currentConversation) {
+    if (!this.currentLocalStorageConversation) {
       await this.createConversationFunction();
 
       await this.sendMessageOperative(this.messageInput.value);
@@ -202,20 +279,49 @@ export class ChatComponent implements OnInit {
     };
   }
 
-  private async getMessagesFromConversation() {
-    if (!this.currentConversation) {
+  // private async getMessagesFromDatabaseConversation() {
+  //   if (!this.currentDatabaseConversation) {
+  //     return;
+  //   } else {
+  //     this.chatMessages = [];
+
+  //     const allMessagesByConversation =
+  //       await this.messageService.getMessagesByConversationId({
+  //         query: {
+  //           where: {
+  //             conversationId: this.currentDatabaseConversation.id,
+  //           },
+  //         },
+  //       });
+
+  //     if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
+  //       allMessagesByConversation.map((message) => {
+  //         const databaseMessageToChatMessage =
+  //           this.buildChatMessageFromDatabaseMessage(message);
+  //         this.chatMessages.push(databaseMessageToChatMessage.question);
+  //         this.chatMessages.push(databaseMessageToChatMessage.response);
+  //       });
+  //     }
+  //   }
+  // }
+
+  private async getLocalStorageMessagesFromConversation() {
+    if (!this.currentLocalStorageConversation) {
       return;
     } else {
       this.chatMessages = [];
 
       const allMessagesByConversation =
-        await this.messageService.getMessagesByConversationId({
-          query: {
-            where: {
-              conversationId: this.currentConversation.id,
-            },
-          },
-        });
+        this.getLocalStorageMessagesByConversationId(
+          this.currentLocalStorageConversation.id
+        );
+      // await this.messageService.getMessagesByConversationId({
+      //   query: {
+      //     where: {
+      //       conversationId: this.currentLocalStorageConversation.id,
+      //     },
+      //   },
+      // });
 
       if (allMessagesByConversation && allMessagesByConversation?.length > 0) {
         allMessagesByConversation.map((message) => {
@@ -228,7 +334,9 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  private buildChatMessageFromDatabaseMessage(databaseMessage: Message): {
+  private buildChatMessageFromDatabaseMessage(
+    databaseMessage: LocalStoragMessage
+  ): {
     question: ChatMessage;
     response: ChatMessage;
   } {
@@ -237,6 +345,16 @@ export class ChatComponent implements OnInit {
       response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
     };
   }
+
+  // private buildChatMessageFromDatabaseMessage(databaseMessage: Message): {
+  //   question: ChatMessage;
+  //   response: ChatMessage;
+  // } {
+  //   return {
+  //     question: this.buildChatMessage('user', databaseMessage.question),
+  //     response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
+  //   };
+  // }
 
   private async sendMessageOperative(guestQuestion: string) {
     console.log('Input at operative', guestQuestion);
@@ -250,23 +368,34 @@ export class ChatComponent implements OnInit {
     const chatResponse: ChatResponse | undefined =
       await this.messageService.sendQuestionToAssistant(guestQuestion);
 
-    if (chatResponse?.chatMessage && this.currentConversation) {
+    if (
+      chatResponse?.chatMessage &&
+      this.currentDatabaseConversation &&
+      this.currentLocalStorageConversation
+    ) {
       this.chatMessages.push(
         this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
       );
 
       const createdMessageResponse = await this.messageService.createMessage(
         this.buildCreateMessageCommand(
-          this.currentConversation.id,
+          this.currentDatabaseConversation.id,
           guestQuestion,
           chatResponse.chatMessage
         )
       );
+
       if (createdMessageResponse.statusCode === 201) {
         this.showSpinner = false;
         setTimeout(() => {
           this.scrollToBottom();
         }, 0);
+
+        this.createLocalStorageMessage(
+          this.currentLocalStorageConversation.id,
+          guestQuestion,
+          chatResponse.chatMessage
+        );
       }
     } else {
       alert('Something went wrong');
@@ -274,36 +403,63 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  public async buildConversationTitle(conversationId: string): Promise<string> {
-    const converstaionMessages =
-      await this.messageService.getMessagesByConversationId({
-        query: {
-          where: {
-            conversationId,
-          },
-        },
-      });
+  public buildConversationTitle(conversationId?: string): string {
+    const localStorageMessages = localStorage.getItem(
+      this.messagesLocalStorageKey
+    );
+    if (localStorageMessages) {
+      const parsedMessages = JSON.parse(
+        localStorageMessages
+      ) as LocalStoragMessages;
+      const messagesByConversationId = parsedMessages.messages.filter(
+        (message) => message.conversationId === conversationId
+      );
+      if (messagesByConversationId && messagesByConversationId.length > 0) {
+        const firstMessage = this.getFirstMessageByConversation(
+          messagesByConversationId
+        );
 
-    if (converstaionMessages && converstaionMessages.length > 0) {
-      return converstaionMessages[0].question;
-    } else {
-      return 'Still no message';
+        return firstMessage.question.slice(0, 10).concat('...');
+      }
     }
+    return 'custom title';
+  }
+
+  private getFirstMessageByConversation(
+    messages: LocalStoragMessage[]
+  ): LocalStoragMessage {
+    messages.sort((a, b) => {
+      if (a.createdAt > b.createdAt) {
+        return 1;
+      } else if (a.createdAt < b.createdAt) {
+        return -1;
+      }
+      return 0;
+    });
+    return messages[0];
   }
 
   public async deleteConversation(conversationId: string) {
-    await this.conversationService.deleteById(conversationId);
+    // await this.conversationService.deleteById(conversationId)  ;
+    this.deleteLocalStorageMessagesByLocalStorageConversationId(conversationId);
+    this.deleteLocalStorageConversation(conversationId);
+    // this.guestId
+    //   ? (this.conversations = await this.conversationService.getByGuestId(
+    //       this.guestId
+    //     ))
+    //   : this.routerNavigator.navigate(['']);
     this.guestId
-      ? (this.conversations = await this.conversationService.getByGuestId(
-          this.guestId
-        ))
+      ? (this.localStorageConversations = this.getLocalStorageConversations())
       : this.routerNavigator.navigate(['']);
-    this.currentConversation = this.getLastConversation();
+    this.currentLocalStorageConversation =
+      this.getLastLocalStorageConversation();
     this.chatMessages = [];
-    if (this.currentConversation) {
-      this.updateCurrentConversation(this.currentConversation);
+    if (this.currentLocalStorageConversation) {
+      this.updateLocalStorageCurrentConversation(
+        this.currentLocalStorageConversation
+      );
     } else {
-      this.currentConversation = undefined;
+      this.currentLocalStorageConversation = undefined;
     }
   }
 
@@ -349,8 +505,212 @@ export class ChatComponent implements OnInit {
         alert('Speech language changed to Spanish');
         break;
       default:
-        this.speechLanguage = 'es-ES';
+        this.recognition.lang = 'es-ES';
         break;
+    }
+  }
+
+  private createLocalStorageConversation(guestId: string) {
+    const isConversations = localStorage.getItem(
+      this.conversationsLocalStorageKey
+    );
+    if (isConversations) {
+      const converstaions: LocalStorageConversations = JSON.parse(
+        localStorage.getItem(this.conversationsLocalStorageKey)!
+      );
+      localStorage.setItem(
+        this.conversationsLocalStorageKey,
+        JSON.stringify({
+          conversations: [
+            ...converstaions.conversations,
+            this.buildLocalStorageConversation(
+              new Date().getTime().toString(),
+              guestId
+            ),
+          ],
+        })
+      );
+      return;
+    }
+
+    localStorage.setItem(
+      this.conversationsLocalStorageKey,
+      JSON.stringify({
+        conversations: [
+          this.buildLocalStorageConversation(
+            new Date().getTime().toString(),
+            guestId
+          ),
+        ],
+      })
+    );
+  }
+
+  private buildLocalStorageConversation(
+    id: string,
+    guestId: string
+  ): LocalStorageConversation {
+    return {
+      id,
+      guestId,
+      createdAt: Number(id),
+    };
+  }
+
+  private getLocalStorageConversations(): LocalStorageConversation[] | [] {
+    const isRawConversations = localStorage.getItem(
+      this.conversationsLocalStorageKey
+    );
+    if (isRawConversations) {
+      const rawConverstions = JSON.parse(
+        isRawConversations
+      ) as LocalStorageConversations;
+      return rawConverstions.conversations;
+    }
+    return [];
+  }
+
+  private deleteLocalStorageConversation(id: string) {
+    const isLocaStorageConversation = localStorage.getItem(
+      this.conversationsLocalStorageKey
+    );
+
+    if (isLocaStorageConversation) {
+      const conversations = JSON.parse(
+        isLocaStorageConversation
+      ) as LocalStorageConversations;
+      const filteredConversations = conversations.conversations.filter(
+        (conversation) => conversation.id !== id
+      );
+      localStorage.setItem(
+        this.conversationsLocalStorageKey,
+        JSON.stringify(
+          this.buildLocalStorageConversations(filteredConversations)
+        )
+      );
+    }
+  }
+
+  private buildLocalStorageConversations(
+    localStorageConvesations: LocalStorageConversation[]
+  ): LocalStorageConversations {
+    return {
+      conversations: localStorageConvesations,
+    };
+  }
+
+  private createLocalStorageMessage(
+    conversationId: string,
+    question: string,
+    chatResponse: string
+  ) {
+    const isLocalStorageMessages = localStorage.getItem(
+      this.messagesLocalStorageKey
+    );
+    if (isLocalStorageMessages) {
+      console.log('Hay mensajes');
+      const parsedLocalStorageMessages = JSON.parse(
+        isLocalStorageMessages
+      ) as LocalStoragMessages;
+      const storage: LocalStoragMessages = {
+        messages: [
+          ...parsedLocalStorageMessages.messages,
+          this.buildLocalStorageMessage(conversationId, question, chatResponse),
+        ],
+      };
+      localStorage.setItem(
+        this.messagesLocalStorageKey,
+        JSON.stringify(storage)
+      );
+      console.log('MESAAAGES');
+      return;
+    }
+    console.log('No hay mensajes');
+    localStorage.setItem(
+      this.messagesLocalStorageKey,
+      JSON.stringify(
+        this.buildLocalStorageMessages(conversationId, question, chatResponse)
+      )
+    );
+    console.log('MESAAAGES');
+  }
+
+  private buildLocalStorageMessage(
+    conversationId: string,
+    question: string,
+    chatResponse: string
+  ): LocalStoragMessage {
+    const timestamp = new Date().getTime().toString();
+    return {
+      id: timestamp,
+      conversationId,
+      question,
+      chatResponse,
+      createdAt: timestamp,
+    };
+  }
+
+  private buildLocalStorageMessages(
+    conversationId: string,
+    question: string,
+    chatResponse: string
+  ): LocalStoragMessages {
+    const timestamp = new Date().getTime().toString();
+    return {
+      messages: [
+        {
+          id: timestamp,
+          conversationId,
+          question,
+          chatResponse,
+          createdAt: timestamp,
+        },
+      ],
+    };
+  }
+
+  private getLocalStorageMessagesByConversationId(
+    conversationId: string
+  ): LocalStoragMessage[] | [] {
+    const isLocalStorageMessages = localStorage.getItem(
+      this.messagesLocalStorageKey
+    );
+    if (isLocalStorageMessages) {
+      const messagesObject = JSON.parse(
+        isLocalStorageMessages
+      ) as LocalStoragMessages;
+      return messagesObject.messages.filter(
+        (message) => message.conversationId === conversationId
+      );
+    }
+
+    return [];
+  }
+
+  private deleteLocalStorageMessagesByLocalStorageConversationId(id: string) {
+    const isLocalStorageConversation = localStorage.getItem(
+      this.conversationsLocalStorageKey
+    );
+    const isLocalStorageMessages = localStorage.getItem(
+      this.messagesLocalStorageKey
+    );
+    if (isLocalStorageConversation && isLocalStorageMessages) {
+      const parsedMessages = JSON.parse(
+        isLocalStorageMessages
+      ) as LocalStoragMessages;
+
+      const filteredMessages = parsedMessages.messages.filter(
+        (message) => message.conversationId !== id
+      );
+
+      const localStorageMessages: LocalStoragMessages = {
+        messages: filteredMessages,
+      };
+
+      localStorage.setItem(
+        this.messagesLocalStorageKey,
+        JSON.stringify(localStorageMessages)
+      );
     }
   }
 }
