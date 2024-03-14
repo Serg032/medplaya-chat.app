@@ -33,6 +33,8 @@ interface ChatMessage {
 
 type messageAuthor = 'user' | 'chat-gpt';
 
+type SupporttedLanguages = 'en-US' | 'es-ES';
+
 // Asegura que SpeechRecognitionEvent esté disponible globalmente
 declare global {
   interface SpeechRecognitionEvent extends Event {
@@ -79,6 +81,7 @@ export class ChatComponent implements OnInit {
   recognizedText: string = '';
 
   public messageHour = new Date().getHours();
+  private speechLanguage: SupporttedLanguages = 'en-US';
 
   constructor(
     private router: ActivatedRoute,
@@ -92,7 +95,7 @@ export class ChatComponent implements OnInit {
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
       this.recognition = new webkitSpeechRecognition();
-      this.recognition.lang = 'es-ES';
+      this.recognition.lang = this.speechLanguage;
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
         this.recognizedText = event.results[0][0].transcript;
         this.messageInput.setValue(
@@ -330,5 +333,26 @@ export class ChatComponent implements OnInit {
     }
 
     return 'CloudIA';
+  }
+
+  public changeLanguage(lang: SupporttedLanguages): void {
+    if (this.isFirefox) {
+      return;
+    }
+    switch (lang) {
+      case 'en-US':
+        this.speechLanguage = 'en-US';
+        console.log(this.speechLanguage);
+        alert('Speech language changed to English');
+        break;
+      case 'es-ES':
+        this.speechLanguage = 'es-ES';
+        console.log(this.speechLanguage);
+        alert('Speech language changed to Spanish');
+        break;
+      default:
+        this.speechLanguage = 'es-ES';
+        break;
+    }
   }
 }

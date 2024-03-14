@@ -43,6 +43,21 @@
       </ul>
       <span *ngIf="conversations.length === 0">No conversations</span>
     </div>
+    <div class="lang-selector" *ngIf="!isFirefox">
+      <span>Speech language selector</span>
+      <div class="lang-values">
+        <div class="flag-container">
+          <button mat-stroked-button (click)="changeLanguage('es-ES')">
+            <span class="fi fi-es flag"></span>
+          </button>
+        </div>
+        <div class="flag-container">
+          <button mat-stroked-button (click)="changeLanguage('en-US')">
+            <span class="fi fi-us flag"></span>
+          </button>
+        </div>
+      </div>
+    </div>
   </mat-drawer>
   <mat-drawer-content>
     <div class="header">
