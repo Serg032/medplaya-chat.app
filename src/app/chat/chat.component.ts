@@ -57,7 +57,6 @@ interface LocalStoragMessages {
 }
 
 // Asegura que SpeechRecognitionEvent esté disponible globalmente
-// if(){
 declare global {
   interface SpeechRecognitionEvent extends Event {
     // Define la estructura de SpeechRecognitionEvent según la especificación
@@ -66,7 +65,6 @@ declare global {
 }
 
 declare var webkitSpeechRecognition: any;
-// }
 
 @Component({
   selector: 'app-chat',
@@ -129,7 +127,6 @@ export class ChatComponent implements OnInit {
         this.messageInput.setValue(
            this.recognizedText
         );
-        console.log("AAAA",this.messageInput)
       };
     }
     this.router.paramMap
