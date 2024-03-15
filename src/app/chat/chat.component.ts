@@ -32,7 +32,7 @@ interface ChatMessage {
 
 type messageAuthor = 'user' | 'chat-gpt';
 
-type SupporttedLanguages = 'en-US' | 'es-ES';
+type SupporttedLanguages = 'en-US' | 'es-ES' |  'gl-ES' | 'ca-ES';
 
 interface LocalStorageConversation {
   id: string;
