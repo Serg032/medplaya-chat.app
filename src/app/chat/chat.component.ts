@@ -307,6 +307,10 @@ export class ChatComponent implements OnInit {
   }
 
   private async sendMessageOperative(guestQuestion: string) {
+    if(guestQuestion === null || guestQuestion === undefined || guestQuestion === ''){
+      alert("Can't send an empty message")
+      return
+    }
     this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
     setTimeout(() => {
       this.scrollToBottom();
