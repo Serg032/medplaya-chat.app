@@ -32,7 +32,7 @@ interface ChatMessage {
 
 type messageAuthor = 'user' | 'chat-gpt';
 
-type SupporttedLanguages = 'en-US' | 'es-ES' |  'gl-ES' | 'ca-ES';
+type SupporttedLanguages = 'en-US' | 'es-ES' | 'gl-ES' | 'ca-ES';
 
 interface LocalStorageConversation {
   id: string;
@@ -112,7 +112,7 @@ export class ChatComponent implements OnInit {
     private routerNavigator: Router,
     private userService: UserService,
     private conversationService: ConversationService,
-    private messageService: MessageService,
+    private messageService: MessageService
   ) {}
 
   async ngOnInit() {
@@ -122,11 +122,9 @@ export class ChatComponent implements OnInit {
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = 'en-US';
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-        console.log("VOICE",event.results[0][0].transcript)
+        console.log('VOICE', event.results[0][0].transcript);
         this.recognizedText = event.results[0][0].transcript;
-        this.messageInput.setValue(
-           this.recognizedText
-        );
+        this.messageInput.setValue(this.recognizedText);
       };
     }
     this.router.paramMap
@@ -307,9 +305,13 @@ export class ChatComponent implements OnInit {
   }
 
   private async sendMessageOperative(guestQuestion: string) {
-    if(guestQuestion === null || guestQuestion === undefined || guestQuestion === ''){
-      alert("Can't send an empty message")
-      return
+    if (
+      guestQuestion === null ||
+      guestQuestion === undefined ||
+      guestQuestion === ''
+    ) {
+      alert("Can't send an empty message");
+      return;
     }
     this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
     setTimeout(() => {
@@ -451,6 +453,14 @@ export class ChatComponent implements OnInit {
       case 'es-ES':
         this.recognition.lang = 'es-ES';
         alert('Speech language changed to Spanish');
+        break;
+      case 'gl-ES':
+        this.recognition.lang = 'gl-ES';
+        alert('Speech language changed to Galician');
+        break;
+      case 'ca-ES':
+        this.recognition.lang = 'ca-ES';
+        alert('Speech language changed to Catalan');
         break;
       default:
         this.recognition.lang = 'es-ES';
