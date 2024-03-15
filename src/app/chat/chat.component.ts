@@ -57,6 +57,7 @@ interface LocalStoragMessages {
 }
 
 // Asegura que SpeechRecognitionEvent esté disponible globalmente
+// if(){
 declare global {
   interface SpeechRecognitionEvent extends Event {
     // Define la estructura de SpeechRecognitionEvent según la especificación
@@ -65,6 +66,7 @@ declare global {
 }
 
 declare var webkitSpeechRecognition: any;
+// }
 
 @Component({
   selector: 'app-chat',
@@ -112,19 +114,22 @@ export class ChatComponent implements OnInit {
     private routerNavigator: Router,
     private userService: UserService,
     private conversationService: ConversationService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {}
 
   async ngOnInit() {
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
+      console.log(this.isFirefox, navigator.userAgent);
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = 'en-US';
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+        console.log("VOICE",event.results[0][0].transcript)
         this.recognizedText = event.results[0][0].transcript;
         this.messageInput.setValue(
-          this.messageInput.value + this.recognizedText
+           this.recognizedText
         );
+        console.log("AAAA",this.messageInput)
       };
     }
     this.router.paramMap
@@ -305,7 +310,6 @@ export class ChatComponent implements OnInit {
   }
 
   private async sendMessageOperative(guestQuestion: string) {
-    console.log('Input at operative', guestQuestion);
     this.chatMessages.push(this.buildChatMessage('user', guestQuestion));
     setTimeout(() => {
       this.scrollToBottom();
