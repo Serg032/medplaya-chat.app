@@ -24,6 +24,7 @@ import {
   CreateMessageCommand,
   MessageService,
 } from '../services/message.service';
+import { DataApiService } from '../services/data-api.service';
 
 interface ChatMessage {
   author: string;
@@ -112,17 +113,16 @@ export class ChatComponent implements OnInit {
     private routerNavigator: Router,
     private userService: UserService,
     private conversationService: ConversationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private dataApiService: DataApiService
   ) {}
 
   async ngOnInit() {
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
-      console.log(this.isFirefox, navigator.userAgent);
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = 'en-US';
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-        console.log('VOICE', event.results[0][0].transcript);
         this.recognizedText = event.results[0][0].transcript;
         this.messageInput.setValue(this.recognizedText);
       };
@@ -230,7 +230,6 @@ export class ChatComponent implements OnInit {
     conversation: LocalStorageConversation
   ) {
     this.currentLocalStorageConversation = conversation;
-    console.log(conversation.id);
     await this.getLocalStorageMessagesFromConversation();
   }
 
@@ -320,23 +319,25 @@ export class ChatComponent implements OnInit {
     this.messageInput.setValue('');
     this.showSpinner = true;
 
-    const chatResponse: ChatResponse | undefined =
-      await this.messageService.sendQuestionToAssistant(guestQuestion);
+    const dataApiResponse = await this.dataApiService.sendQuestion({
+      question: guestQuestion,
+      hotel: 'Calypso',
+    });
 
     if (
-      chatResponse?.chatMessage &&
+      dataApiResponse &&
       this.currentDatabaseConversation &&
       this.currentLocalStorageConversation
     ) {
       this.chatMessages.push(
-        this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
+        this.buildChatMessage('chat-gpt', dataApiResponse)
       );
 
       const createdMessageResponse = await this.messageService.createMessage(
         this.buildCreateMessageCommand(
           this.currentDatabaseConversation.id,
           guestQuestion,
-          chatResponse.chatMessage
+          dataApiResponse
         )
       );
 
@@ -349,7 +350,7 @@ export class ChatComponent implements OnInit {
         this.createLocalStorageMessage(
           this.currentLocalStorageConversation.id,
           guestQuestion,
-          chatResponse.chatMessage
+          dataApiResponse
         );
       }
     } else {
@@ -566,7 +567,6 @@ export class ChatComponent implements OnInit {
       this.messagesLocalStorageKey
     );
     if (isLocalStorageMessages) {
-      console.log('Hay mensajes');
       const parsedLocalStorageMessages = JSON.parse(
         isLocalStorageMessages
       ) as LocalStoragMessages;
@@ -580,17 +580,16 @@ export class ChatComponent implements OnInit {
         this.messagesLocalStorageKey,
         JSON.stringify(storage)
       );
-      console.log('MESAAAGES');
+
       return;
     }
-    console.log('No hay mensajes');
+
     localStorage.setItem(
       this.messagesLocalStorageKey,
       JSON.stringify(
         this.buildLocalStorageMessages(conversationId, question, chatResponse)
       )
     );
-    console.log('MESAAAGES');
   }
 
   private buildLocalStorageMessage(
