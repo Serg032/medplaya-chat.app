@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 
 interface RequestPayload {
   question: string;
+  hotel: Hotel;
 }
+
+type Hotel = 'Calypso';
 
 @Injectable({
   providedIn: 'root',
@@ -12,26 +15,24 @@ export class DataApiService {
 
   public async makeQuestion(question: string) {
     const response = await fetch(
-      'https://claudiafunc-dev.azurewebsites.net/api/medplayafunc',
+      'https://claudiafunc.azurewebsites.net/api/medplayafunc',
       {
         method: 'POST',
-        headers:{
-          "x-functions-key": 'nweHKZRxXM81Qex1p-__fzEUJ5bt1w-tortOdB7Vv1BdAzFuEvmtHw==',
+        headers: {
+          'x-functions-key':
+            '8OM1OEwq1y2GOVfvYfQB6yXQbOB_5KhSoSYaZ3zgv4chAzFugGvudg==',
         },
-        body: JSON.stringify(({
-          "question":"Es mi cumpleaños. Qué puedo hacer para celebrarlo? ",
-          "hotel":"Calypso"
-      }
-      )),
+        body: JSON.stringify(this.buildPayload(question)),
       }
     );
 
-    return response;
+    return response.text();
   }
 
   private buildPayload(question: string): RequestPayload {
     return {
       question,
+      hotel: 'Calypso',
     };
   }
 }
