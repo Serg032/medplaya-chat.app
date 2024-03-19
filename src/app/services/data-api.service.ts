@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from './../../environments/environment';
 
 interface Payload {
   question: string;
@@ -9,7 +10,7 @@ interface Payload {
   providedIn: 'root',
 })
 export class DataApiService {
-  private apiUrl = 'https://claudiafunc-dev.azurewebsites.net/api/medplayafunc';
+  private apiUrl = environment.aiDataUrl;
   constructor() {}
 
   public async sendQuestion(payload: Payload) {
@@ -17,8 +18,7 @@ export class DataApiService {
       const data = await fetch(this.apiUrl, {
         method: 'POST',
         headers: {
-          'x-functions-key':
-            'nweHKZRxXM81Qex1p-__fzEUJ5bt1w-tortOdB7Vv1BdAzFuEvmtHw==',
+          'x-functions-key': environment.apiKey,
         },
         body: JSON.stringify(payload),
       });

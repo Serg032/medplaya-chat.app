@@ -8,6 +8,7 @@
 .env
 .angular
 environment
+environments
 
 # Node
 /node_modules
