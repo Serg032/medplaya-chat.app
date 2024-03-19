@@ -106,26 +106,27 @@ export class MessageService {
     }
   }
 
-  public async sendQuestionToAssistant(
-    userQuestion: string
-  ): Promise<ChatResponse | undefined> {
-    try {
-      const response = await fetch(this.assitantUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userQuestion }),
-      });
-      if (!response.ok) {
-        return;
-      }
+  // unused
+  // public async sendQuestionToAssistant(
+  //   userQuestion: string
+  // ): Promise<ChatResponse | undefined> {
+  //   try {
+  //     const response = await fetch(this.assitantUrl, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ message: userQuestion }),
+  //     });
+  //     if (!response.ok) {
+  //       return;
+  //     }
 
-      return (await response.json()) as ChatResponse;
-    } catch (error) {
-      throw error;
-    }
-  }
+  //     return (await response.json()) as ChatResponse;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   public async getMessagesByConversationId(
     query: GetMessagesByConversationIdQuery

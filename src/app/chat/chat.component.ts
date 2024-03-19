@@ -118,7 +118,6 @@ export class ChatComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    console.log(await this.dataApiService.makeQuestion('Que es Salou?'));
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
       this.recognition = new webkitSpeechRecognition();
@@ -126,6 +125,7 @@ export class ChatComponent implements OnInit {
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
         console.log('VOICE', event.results[0][0].transcript);
         this.recognizedText = event.results[0][0].transcript;
+        this.messageInput.setValue(this.recognizedText);
         this.messageInput.setValue(this.recognizedText);
       };
     }
@@ -232,7 +232,6 @@ export class ChatComponent implements OnInit {
     conversation: LocalStorageConversation
   ) {
     this.currentLocalStorageConversation = conversation;
-    console.log(conversation.id);
     await this.getLocalStorageMessagesFromConversation();
   }
 
@@ -322,23 +321,21 @@ export class ChatComponent implements OnInit {
     this.messageInput.setValue('');
     this.showSpinner = true;
 
-    const chatResponse: ChatResponse | undefined =
-      await this.messageService.sendQuestionToAssistant(guestQuestion);
+    const chatResponse: string | undefined =
+      await this.dataApiService.makeQuestion(guestQuestion);
 
     if (
-      chatResponse?.chatMessage &&
+      chatResponse &&
       this.currentDatabaseConversation &&
       this.currentLocalStorageConversation
     ) {
-      this.chatMessages.push(
-        this.buildChatMessage('chat-gpt', chatResponse.chatMessage)
-      );
+      this.chatMessages.push(this.buildChatMessage('chat-gpt', chatResponse));
 
       const createdMessageResponse = await this.messageService.createMessage(
         this.buildCreateMessageCommand(
           this.currentDatabaseConversation.id,
           guestQuestion,
-          chatResponse.chatMessage
+          chatResponse
         )
       );
 
@@ -351,7 +348,7 @@ export class ChatComponent implements OnInit {
         this.createLocalStorageMessage(
           this.currentLocalStorageConversation.id,
           guestQuestion,
-          chatResponse.chatMessage
+          chatResponse
         );
       }
     } else {
@@ -568,7 +565,6 @@ export class ChatComponent implements OnInit {
       this.messagesLocalStorageKey
     );
     if (isLocalStorageMessages) {
-      console.log('Hay mensajes');
       const parsedLocalStorageMessages = JSON.parse(
         isLocalStorageMessages
       ) as LocalStoragMessages;
@@ -582,17 +578,14 @@ export class ChatComponent implements OnInit {
         this.messagesLocalStorageKey,
         JSON.stringify(storage)
       );
-      console.log('MESAAAGES');
       return;
     }
-    console.log('No hay mensajes');
     localStorage.setItem(
       this.messagesLocalStorageKey,
       JSON.stringify(
         this.buildLocalStorageMessages(conversationId, question, chatResponse)
       )
     );
-    console.log('MESAAAGES');
   }
 
   private buildLocalStorageMessage(

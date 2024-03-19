@@ -74,7 +74,6 @@ export class UserService {
       this.validateClientLogin(loginResponse.guest, checkinDate);
       localStorage.setItem('accessToken', loginResponse.accessToken.toString());
 
-      console.log(loginResponse.guest);
       return {
         accessToken: loginResponse.accessToken,
         guest: loginResponse.guest,
