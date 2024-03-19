@@ -24,6 +24,7 @@ import {
   CreateMessageCommand,
   MessageService,
 } from '../services/message.service';
+import { DataApiService } from '../services/data-api.service';
 
 interface ChatMessage {
   author: string;
@@ -112,13 +113,14 @@ export class ChatComponent implements OnInit {
     private routerNavigator: Router,
     private userService: UserService,
     private conversationService: ConversationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private dataApiService: DataApiService
   ) {}
 
   async ngOnInit() {
+    console.log(await this.dataApiService.makeQuestion('Que es Salou?'));
     this.isFirefox = navigator.userAgent.includes('Firefox');
     if (!this.isFirefox) {
-      console.log(this.isFirefox, navigator.userAgent);
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = 'en-US';
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
