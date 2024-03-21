@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GetUserByIdResponse } from './user.service';
+import { environment } from '../../environments/environment';
 
 export interface ConversationByQuery {
   id: string;
@@ -17,7 +18,7 @@ export interface CreateConversationCommand {
   providedIn: 'root',
 })
 export class ConversationService {
-  private productionUrl = 'https://medplaya-nestjs-back.azurewebsites.net';
+  private rootUrl = environment.apiUrl;
   private headers = {
     'Content-Type': 'application/json',
   };
@@ -28,7 +29,7 @@ export class ConversationService {
     console.log('Conversation by guest id');
     try {
       const dataFetched = await fetch(
-        `${this.productionUrl}/conversations/get/${guestId}`,
+        `${this.rootUrl}/conversations/get/${guestId}`,
         {
           method: 'GET',
         }
@@ -43,7 +44,7 @@ export class ConversationService {
   public async create(command: CreateConversationCommand) {
     console.log('Conversation create');
     try {
-      const dataFetched = await fetch(`${this.productionUrl}/conversations`, {
+      const dataFetched = await fetch(`${this.rootUrl}/conversations`, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify({
@@ -59,7 +60,7 @@ export class ConversationService {
 
   public async deleteById(id: string) {
     try {
-      await fetch(`${this.productionUrl}/${id}`, {
+      await fetch(`${this.rootUrl}/${id}`, {
         method: 'DELETE',
         headers: this.headers,
       });

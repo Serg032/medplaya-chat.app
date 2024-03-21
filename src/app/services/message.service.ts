@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Regime } from './user.service';
+import { environment } from '../../environments/environment';
 
 export interface Message {
   id: string;
@@ -58,7 +59,7 @@ export interface FailedCreateResponse {
   providedIn: 'root',
 })
 export class MessageService {
-  private productionUrl = 'https://medplaya-nestjs-back.azurewebsites.net';
+  private rootUrl = environment.apiUrl;
   private headers = {
     'Content-Type': 'application/json',
   };
@@ -69,7 +70,7 @@ export class MessageService {
     command: CreateMessageCommand
   ): Promise<SuccessCreatefullyResponse | FailedCreateResponse> {
     try {
-      const response = await fetch(`${this.productionUrl}/messages`, {
+      const response = await fetch(`${this.rootUrl}/messages`, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify(command),
@@ -97,13 +98,10 @@ export class MessageService {
   public async getMessagesByConversationId(
     conversationId: string
   ): Promise<Message[] | [] | undefined> {
-    const response = await fetch(
-      `${this.productionUrl}/messages/${conversationId}`,
-      {
-        method: 'GET',
-        headers: this.headers,
-      }
-    );
+    const response = await fetch(`${this.rootUrl}/messages/${conversationId}`, {
+      method: 'GET',
+      headers: this.headers,
+    });
 
     if (!response.ok) {
       return;

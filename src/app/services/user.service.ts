@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MedplayaGuest } from '../login/login.component';
-import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../environments/environment';
 
 interface Query {
   username: string;
@@ -42,11 +42,10 @@ export interface GetUserByIdResponse {
 export class UserService {
   constructor(private router: Router) {}
 
-  private productionUrl = 'https://medplaya-nestjs-back.azurewebsites.net';
-  private localhostUrl = 'http://localhost:8080/medplaya/guests/login';
+  private rootUrl = environment.apiUrl;
 
   public async loginTest() {
-    const data = await fetch(`${this.productionUrl}/guests/login`, {
+    const data = await fetch(`${this.rootUrl}/guests/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +64,7 @@ export class UserService {
       const query: Query = {
         username,
       };
-      const dataFetched = await fetch(`${this.productionUrl}/guests/login`, {
+      const dataFetched = await fetch(`${this.rootUrl}/guests/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,13 +83,6 @@ export class UserService {
 
       const loginResponse = (await dataFetched.json()) as LoginResponse;
 
-      console.log(
-        loginResponse,
-        'Date In',
-        loginResponse.guest.dateIn,
-        'DateOut',
-        loginResponse.guest.dateOut
-      );
       this.validateClientLogin(loginResponse.guest, checkinDate);
       localStorage.setItem('accessToken', loginResponse.accessToken.toString());
 
@@ -106,23 +98,9 @@ export class UserService {
   private validateClientLogin(guest: MedplayaGuest, checkinDate: number): void {
     const marshledGuestDateIn = new Date(Number(guest.dateIn));
     marshledGuestDateIn.setHours(0);
-    console.log('Marshal', marshledGuestDateIn);
-    console.log(
-      'Input',
-      new Date(checkinDate).toString(),
-      'Guest CheckIn',
-      marshledGuestDateIn.toString(),
-      'input n',
-      checkinDate,
-      'guest number',
-      guest.dateIn,
-      checkinDate === marshledGuestDateIn.getTime()
-    );
 
     const earlyLoginLimit = this.buildEarlyLoginLimit(marshledGuestDateIn);
     const latelyLoginLimit = this.buildLatelyLoginLimit(marshledGuestDateIn);
-
-    console.log(earlyLoginLimit, latelyLoginLimit);
 
     if (checkinDate === marshledGuestDateIn.getTime()) {
       const todayDate = this.buildToday();
@@ -190,7 +168,7 @@ export class UserService {
   public getGuestById = async (
     id: string
   ): Promise<GetUserByIdResponse | undefined> => {
-    const response = await fetch(`${this.productionUrl}/guests/find/${id}`, {
+    const response = await fetch(`${this.rootUrl}/guests/find/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

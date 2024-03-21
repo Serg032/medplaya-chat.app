@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { UserService } from '../services/user.service';
+import { environment } from '../../environments/environment';
 
 interface GuestId {
   _value: string;
@@ -48,7 +49,7 @@ export class LoginComponent {
   });
 
   async ngOnInit() {
-    console.log(await this.loginService.loginTest());
+    console.log(environment.apiUrl);
   }
   public async onSubmit() {
     const value = this.userProfileForm.value;
