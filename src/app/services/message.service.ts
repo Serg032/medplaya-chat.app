@@ -35,18 +35,9 @@ export interface Message {
 }
 
 export interface CreateMessageCommand {
-  id: string;
   question: string;
   chatResponse: string;
   conversationId: string;
-}
-
-interface GetMessagesByConversationIdQuery {
-  query: {
-    where: {
-      conversationId: string;
-    };
-  };
 }
 
 export interface ChatResponse {
@@ -67,10 +58,7 @@ export interface FailedCreateResponse {
   providedIn: 'root',
 })
 export class MessageService {
-  private rootUrl = 'http://localhost:8080/medplaya';
-  private getMessagesUrl = `${this.rootUrl}/messages/get`;
-  private createMessageUrl = `${this.rootUrl}/message/create`;
-  private assitantUrl = 'http://localhost:3000';
+  private productionUrl = 'https://medplaya-nestjs-back.azurewebsites.net';
   private headers = {
     'Content-Type': 'application/json',
   };
@@ -81,7 +69,7 @@ export class MessageService {
     command: CreateMessageCommand
   ): Promise<SuccessCreatefullyResponse | FailedCreateResponse> {
     try {
-      const response = await fetch(this.createMessageUrl, {
+      const response = await fetch(`${this.productionUrl}/messages`, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify(command),
@@ -106,36 +94,16 @@ export class MessageService {
     }
   }
 
-  // unused
-  // public async sendQuestionToAssistant(
-  //   userQuestion: string
-  // ): Promise<ChatResponse | undefined> {
-  //   try {
-  //     const response = await fetch(this.assitantUrl, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ message: userQuestion }),
-  //     });
-  //     if (!response.ok) {
-  //       return;
-  //     }
-
-  //     return (await response.json()) as ChatResponse;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
   public async getMessagesByConversationId(
-    query: GetMessagesByConversationIdQuery
+    conversationId: string
   ): Promise<Message[] | [] | undefined> {
-    const response = await fetch(this.getMessagesUrl, {
-      method: 'POST',
-      headers: this.headers,
-      body: JSON.stringify(query),
-    });
+    const response = await fetch(
+      `${this.productionUrl}/messages/${conversationId}`,
+      {
+        method: 'GET',
+        headers: this.headers,
+      }
+    );
 
     if (!response.ok) {
       return;

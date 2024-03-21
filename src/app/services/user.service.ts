@@ -24,7 +24,7 @@ export interface GetUserByIdResponse {
   name: string;
   surname1: string;
   surname2: string;
-  userName: string;
+  username: string;
   dateIn: string;
   dateOut: string;
   bookingId: string;
@@ -42,24 +42,36 @@ export interface GetUserByIdResponse {
 export class UserService {
   constructor(private router: Router) {}
 
+  private productionUrl = 'https://medplaya-nestjs-back.azurewebsites.net';
+  private localhostUrl = 'http://localhost:8080/medplaya/guests/login';
+
+  public async loginTest() {
+    const data = await fetch(`${this.productionUrl}/guests/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: 'radigalesm' }),
+    });
+
+    return await data.json();
+  }
+
   public async login(
     username: string,
-    checkinDate: string
+    checkinDate: number
   ): Promise<LoginResponse | string> {
     try {
       const query: Query = {
         username,
       };
-      const dataFetched = await fetch(
-        'http://localhost:8080/medplaya/guests/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(query),
-        }
-      );
+      const dataFetched = await fetch(`${this.productionUrl}/guests/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(query),
+      });
 
       if (dataFetched.status === 404) {
         alert('El usuario no existe');
@@ -71,6 +83,14 @@ export class UserService {
       }
 
       const loginResponse = (await dataFetched.json()) as LoginResponse;
+
+      console.log(
+        loginResponse,
+        'Date In',
+        loginResponse.guest.dateIn,
+        'DateOut',
+        loginResponse.guest.dateOut
+      );
       this.validateClientLogin(loginResponse.guest, checkinDate);
       localStorage.setItem('accessToken', loginResponse.accessToken.toString());
 
@@ -83,25 +103,28 @@ export class UserService {
     }
   }
 
-  private validateClientLogin(guest: MedplayaGuest, checkinDate: string): void {
-    const guestDateIn = guest.dateIn._value;
-    const guestDateOut = guest.dateOut._value;
-    const inputCheckin = new Date(checkinDate);
-    inputCheckin.setHours(0);
-    inputCheckin.setMinutes(0);
-    inputCheckin.setSeconds(0);
-    inputCheckin.setMilliseconds(0);
+  private validateClientLogin(guest: MedplayaGuest, checkinDate: number): void {
+    const marshledGuestDateIn = new Date(Number(guest.dateIn));
+    marshledGuestDateIn.setHours(0);
+    console.log('Marshal', marshledGuestDateIn);
+    console.log(
+      'Input',
+      new Date(checkinDate).toString(),
+      'Guest CheckIn',
+      marshledGuestDateIn.toString(),
+      'input n',
+      checkinDate,
+      'guest number',
+      guest.dateIn,
+      checkinDate === marshledGuestDateIn.getTime()
+    );
 
-    const databaseCheckin = new Date(guest.dateIn._value);
-    databaseCheckin.setHours(0);
-    databaseCheckin.setMinutes(0);
-    databaseCheckin.setSeconds(0);
-    databaseCheckin.setMilliseconds(0);
+    const earlyLoginLimit = this.buildEarlyLoginLimit(marshledGuestDateIn);
+    const latelyLoginLimit = this.buildLatelyLoginLimit(marshledGuestDateIn);
 
-    const earlyLoginLimit = this.buildEarlyLoginLimit(new Date(guestDateIn));
-    const latelyLoginLimit = this.buildLatelyLoginLimit(new Date(guestDateOut));
+    console.log(earlyLoginLimit, latelyLoginLimit);
 
-    if (databaseCheckin.getTime() === inputCheckin.getTime()) {
+    if (checkinDate === marshledGuestDateIn.getTime()) {
       const todayDate = this.buildToday();
 
       if (todayDate.getTime() < earlyLoginLimit.getTime()) {
@@ -111,7 +134,7 @@ export class UserService {
         alert('Access denied, too late');
         return;
       } else {
-        this.navigateToChat(guest.id._value);
+        this.navigateToChat(guest.id);
       }
     } else {
       alert('Wrong check in date');
@@ -153,11 +176,11 @@ export class UserService {
     if (!accessToken) {
       this.navigateToLogin();
     } else {
-      const decodedToken: Token = jwtDecode(accessToken);
+      const decodedToken = accessToken.split('/');
       if (
         !accessToken ||
-        guest.id !== decodedToken.guestId._value ||
-        guest.userName !== decodedToken.username._value
+        guest.id !== decodedToken[0] ||
+        guest.username !== decodedToken[1]
       ) {
         this.navigateToLogin();
       }
@@ -167,15 +190,12 @@ export class UserService {
   public getGuestById = async (
     id: string
   ): Promise<GetUserByIdResponse | undefined> => {
-    const response = await fetch(
-      `http://localhost:8080/medplaya/guest/find/${id}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await fetch(`${this.productionUrl}/guests/find/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return (await response.json()) as GetUserByIdResponse;
   };
 }

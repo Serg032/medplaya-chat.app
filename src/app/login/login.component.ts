@@ -18,13 +18,13 @@ interface GuestDate {
 }
 
 export interface MedplayaGuest {
-  id: GuestId;
+  id: string;
   name: string;
   surname1: string;
   surname2: string;
-  userName: GuestUsername;
-  dateIn: GuestDate;
-  dateOut: GuestDate;
+  username: GuestUsername;
+  dateIn: number;
+  dateOut: number;
 }
 
 @Component({
@@ -47,13 +47,16 @@ export class LoginComponent {
     checkInDate: new FormControl(''),
   });
 
+  async ngOnInit() {
+    console.log(await this.loginService.loginTest());
+  }
   public async onSubmit() {
     const value = this.userProfileForm.value;
     const username = value.username;
     const checkinDate = value.checkInDate;
 
     if (username && checkinDate) {
-      await this.loginService.login(username, checkinDate);
+      await this.loginService.login(username, new Date(checkinDate).getTime());
     } else {
       alert('All fields needed');
     }

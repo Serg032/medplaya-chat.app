@@ -123,7 +123,6 @@ export class ChatComponent implements OnInit {
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = 'en-US';
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-        console.log('VOICE', event.results[0][0].transcript);
         this.recognizedText = event.results[0][0].transcript;
         this.messageInput.setValue(this.recognizedText);
         this.messageInput.setValue(this.recognizedText);
@@ -183,6 +182,8 @@ export class ChatComponent implements OnInit {
 
           this.databaseConversations =
             await this.conversationService.getByGuestId(this.guestId);
+
+          console.log('Database conversations', this.databaseConversations);
 
           this.currentDatabaseConversation = this.getLastDatabaseConversation();
 
@@ -264,7 +265,6 @@ export class ChatComponent implements OnInit {
     let customQuestion;
 
     return {
-      id: crypto.randomUUID(),
       question: customQuestion ? customQuestion : question,
       chatResponse: customChatResponse ? customChatResponse : chatResponse,
       conversationId: conversationId,

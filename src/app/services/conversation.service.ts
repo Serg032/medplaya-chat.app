@@ -17,10 +17,7 @@ export interface CreateConversationCommand {
   providedIn: 'root',
 })
 export class ConversationService {
-  private rootUrl = 'http://localhost:8080/medplaya';
-  private getUrl = `${this.rootUrl}/conversations/get`;
-  private createUrl = `${this.rootUrl}/conversation/create`;
-  private deleteUrl = `${this.rootUrl}/conversation/delete`;
+  private productionUrl = 'https://medplaya-nestjs-back.azurewebsites.net';
   private headers = {
     'Content-Type': 'application/json',
   };
@@ -28,15 +25,14 @@ export class ConversationService {
   public async getByGuestId(
     guestId: string
   ): Promise<ConversationByQuery[] | []> {
+    console.log('Conversation by guest id');
     try {
-      const dataFetched = await fetch(this.getUrl, {
-        method: 'POST',
-        body: JSON.stringify({
-          where: {
-            guestId,
-          },
-        }),
-      });
+      const dataFetched = await fetch(
+        `${this.productionUrl}/conversations/get/${guestId}`,
+        {
+          method: 'GET',
+        }
+      );
 
       return (await dataFetched.json()) as ConversationByQuery[] | [];
     } catch (error) {
@@ -45,12 +41,12 @@ export class ConversationService {
   }
 
   public async create(command: CreateConversationCommand) {
+    console.log('Conversation create');
     try {
-      const dataFetched = await fetch(this.createUrl, {
+      const dataFetched = await fetch(`${this.productionUrl}/conversations`, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify({
-          id: crypto.randomUUID(),
           guestId: command.guestId,
         }),
       });
@@ -63,7 +59,7 @@ export class ConversationService {
 
   public async deleteById(id: string) {
     try {
-      await fetch(`${this.deleteUrl}/${id}`, {
+      await fetch(`${this.productionUrl}/${id}`, {
         method: 'DELETE',
         headers: this.headers,
       });
