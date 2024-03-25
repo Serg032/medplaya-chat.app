@@ -19,7 +19,7 @@ export class DataApiService {
       method: 'POST',
       headers: {
         'x-functions-key':
-          'nweHKZRxXM81Qex1p-__fzEUJ5bt1w-tortOdB7Vv1BdAzFuEvmtHw==',
+          '8OM1OEwq1y2GOVfvYfQB6yXQbOB_5KhSoSYaZ3zgv4chAzFugGvudg==',
       },
       body: JSON.stringify(this.buildPayload(question)),
     });
