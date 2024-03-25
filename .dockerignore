@@ -1,0 +1,11 @@
+.git
+
+.editorconfig
+
+.vscode
+
+.gitignore
+
+/node_modules
+
+*.md
