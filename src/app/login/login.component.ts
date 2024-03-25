@@ -48,9 +48,7 @@ export class LoginComponent {
     checkInDate: new FormControl(''),
   });
 
-  async ngOnInit() {
-    console.log(environment.apiUrl);
-  }
+  async ngOnInit() {}
   public async onSubmit() {
     const value = this.userProfileForm.value;
     const username = value.username;

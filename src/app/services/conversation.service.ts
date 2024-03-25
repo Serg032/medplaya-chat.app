@@ -24,7 +24,6 @@ export class ConversationService {
   public async getByGuestId(
     guestId: string
   ): Promise<ConversationByQuery[] | []> {
-    console.log('Conversation by guest id');
     try {
       const dataFetched = await fetch(
         `${this.rootUrl}/conversations/get/${guestId}`,
@@ -40,7 +39,6 @@ export class ConversationService {
   }
 
   public async create(command: CreateConversationCommand) {
-    console.log('Conversation create');
     try {
       const dataFetched = await fetch(`${this.rootUrl}/conversations`, {
         method: 'POST',

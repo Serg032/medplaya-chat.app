@@ -183,8 +183,6 @@ export class ChatComponent implements OnInit {
           this.databaseConversations =
             await this.conversationService.getByGuestId(this.guestId);
 
-          console.log('Database conversations', this.databaseConversations);
-
           this.currentDatabaseConversation = this.getLastDatabaseConversation();
 
           this.currentLocalStorageConversation =
