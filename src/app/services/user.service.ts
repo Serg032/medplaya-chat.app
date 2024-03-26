@@ -97,10 +97,12 @@ export class UserService {
 
   private validateClientLogin(guest: MedplayaGuest, checkinDate: number): void {
     const marshledGuestDateIn = new Date(Number(guest.dateIn));
+    const marshledGuestDateOut = new Date(Number(guest.dateOut));
     marshledGuestDateIn.setHours(0);
 
     const earlyLoginLimit = this.buildEarlyLoginLimit(marshledGuestDateIn);
-    const latelyLoginLimit = this.buildLatelyLoginLimit(marshledGuestDateIn);
+    const latelyLoginLimit = this.buildLatelyLoginLimit(marshledGuestDateOut);
+    console.log('early', earlyLoginLimit, 'late', latelyLoginLimit);
 
     if (checkinDate === marshledGuestDateIn.getTime()) {
       const todayDate = this.buildToday();
