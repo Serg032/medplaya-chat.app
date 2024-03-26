@@ -250,7 +250,7 @@ export class ChatComponent implements OnInit {
   ): ChatMessage {
     return {
       author,
-      message,
+      message: `<span>${message}</span>`,
     };
   }
 
@@ -299,7 +299,10 @@ export class ChatComponent implements OnInit {
   } {
     return {
       question: this.buildChatMessage('user', databaseMessage.question),
-      response: this.buildChatMessage('chat-gpt', databaseMessage.chatResponse),
+      response: this.buildChatMessage(
+        'chat-gpt',
+        this.dataApiService.buildResponse(databaseMessage.chatResponse)
+      ),
     };
   }
 
@@ -327,7 +330,13 @@ export class ChatComponent implements OnInit {
       this.currentDatabaseConversation &&
       this.currentLocalStorageConversation
     ) {
-      this.chatMessages.push(this.buildChatMessage('chat-gpt', chatResponse));
+      // this.chatMessages.push(this.buildChatMessage('chat-gpt', chatResponse));
+      this.chatMessages.push(
+        this.buildChatMessage(
+          'chat-gpt',
+          this.dataApiService.buildResponse(chatResponse)
+        )
+      );
 
       const createdMessageResponse = await this.messageService.createMessage(
         this.buildCreateMessageCommand(

@@ -33,4 +33,34 @@ export class DataApiService {
       hotel: 'Calypso',
     };
   }
+
+  public buildResponse(response: string) {
+    if (response.includes('http') || response.includes('www')) {
+      const splittedResponse = response.split(' ');
+      const link = splittedResponse.find(
+        (link) => link.includes('http') || link.includes('www')
+      );
+      if (link) {
+        const linkIndex = splittedResponse.indexOf(link);
+        // Quiero que el link si su ultimo caracter no es una letra o un numero sea eliminado
+        const lastChar = link[link.length - 1];
+        if (link && !lastChar.match(/[a-z0-9]/i)) {
+          const customLink = link.slice(0, -1);
+          const linkBuilt = `<a href="${customLink}" target="_blank">${link}</a>`;
+          splittedResponse[linkIndex] = linkBuilt;
+
+          return splittedResponse.join(' ');
+        }
+        const linkBuilt = `<a href="${link}" target="_blank">${link}</a>`;
+        splittedResponse[linkIndex] = linkBuilt;
+
+        return splittedResponse.join(' ');
+      }
+    }
+
+    response.split(' ').unshift('<span>');
+    response.split(' ').push('</span>');
+
+    return response;
+  }
 }

@@ -125,9 +125,7 @@
             *ngIf="chatMessages.length > 0"
           >
             <mat-card-content>
-              <span
-                ><b>{{ chatMessage.message }}</b></span
-              >
+              <div [innerHTML]="chatMessage.message"></div>
             </mat-card-content>
           </mat-card>
         </div>
