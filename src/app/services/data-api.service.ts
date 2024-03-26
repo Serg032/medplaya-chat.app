@@ -36,7 +36,6 @@ export class DataApiService {
 
   public buildResponse(response: string) {
     const links = this.extractLinksFromString(response);
-    console.log('Links: ', links);
 
     if (links.length > 0) {
       links.map((link) => {

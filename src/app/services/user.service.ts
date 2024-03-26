@@ -102,7 +102,6 @@ export class UserService {
 
     const earlyLoginLimit = this.buildEarlyLoginLimit(marshledGuestDateIn);
     const latelyLoginLimit = this.buildLatelyLoginLimit(marshledGuestDateOut);
-    console.log('early', earlyLoginLimit, 'late', latelyLoginLimit);
 
     if (checkinDate === marshledGuestDateIn.getTime()) {
       const todayDate = this.buildToday();
