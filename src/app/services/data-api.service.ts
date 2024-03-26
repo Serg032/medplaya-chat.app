@@ -35,32 +35,32 @@ export class DataApiService {
   }
 
   public buildResponse(response: string) {
-    if (response.includes('http') || response.includes('www')) {
-      const splittedResponse = response.split(' ');
-      const link = splittedResponse.find(
-        (link) => link.includes('http') || link.includes('www')
-      );
-      if (link) {
-        const linkIndex = splittedResponse.indexOf(link);
-        // Quiero que el link si su ultimo caracter no es una letra o un numero sea eliminado
-        const lastChar = link[link.length - 1];
-        if (link && !lastChar.match(/[a-z0-9]/i)) {
-          const customLink = link.slice(0, -1);
-          const linkBuilt = `<a href="${customLink}" target="_blank">${link}</a>`;
-          splittedResponse[linkIndex] = linkBuilt;
+    const links = this.extractLinksFromString(response);
+    console.log('Links: ', links);
 
-          return splittedResponse.join(' ');
-        }
-        const linkBuilt = `<a href="${link}" target="_blank">${link}</a>`;
-        splittedResponse[linkIndex] = linkBuilt;
+    if (links.length > 0) {
+      links.map((link) => {
+        response = response.replace(
+          link,
+          `<a href="${link}" target="_blank">${link}</a>`
+        );
+      });
 
-        return splittedResponse.join(' ');
-      }
+      response.split(' ').unshift('<span>');
+      response.split(' ').push('</span>');
+
+      return response;
     }
 
     response.split(' ').unshift('<span>');
     response.split(' ').push('</span>');
 
     return response;
+  }
+
+  public extractLinksFromString(text: string): string[] {
+    const regex = /(http[s]?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+    const links = text.match(regex);
+    return links || [];
   }
 }
