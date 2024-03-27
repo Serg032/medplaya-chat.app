@@ -78,8 +78,6 @@ export class UserService {
 
       const loginResponse = (await dataFetched.json()) as LoginResponse;
 
-      console.log(loginResponse);
-
       if (!loginResponse.guest) {
         alert('User not found');
         return 'User not found';
