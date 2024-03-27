@@ -5,25 +5,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { UserService } from '../services/user.service';
-import { environment } from '../../environments/environment';
-
-interface GuestId {
-  _value: string;
-}
-
-interface GuestUsername {
-  _value: string;
-}
-interface GuestDate {
-  _value: string;
-}
 
 export interface MedplayaGuest {
   id: string;
   name: string;
   surname1: string;
   surname2: string;
-  username: GuestUsername;
+  username: string;
   dateIn: number;
   dateOut: number;
 }

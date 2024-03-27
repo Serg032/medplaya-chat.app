@@ -12,11 +12,6 @@ export interface LoginResponse {
   guest: MedplayaGuest;
 }
 
-interface Token {
-  guestId: { _value: string };
-  username: { _value: string };
-}
-
 export type Regime = 'FULL' | 'STANDARD' | 'BASIC';
 
 export interface GetUserByIdResponse {
@@ -82,6 +77,13 @@ export class UserService {
       }
 
       const loginResponse = (await dataFetched.json()) as LoginResponse;
+
+      console.log(loginResponse);
+
+      if (!loginResponse.guest) {
+        alert('User not found');
+        return 'User not found';
+      }
 
       this.validateClientLogin(loginResponse.guest, checkinDate);
       localStorage.setItem('accessToken', loginResponse.accessToken.toString());
