@@ -33,7 +33,7 @@ interface ChatMessage {
 
 type messageAuthor = 'user' | 'chat-gpt';
 
-type SupporttedLanguages = 'en-US' | 'es-ES' | 'gl-ES' | 'ca-ES';
+type SupporttedLanguages = 'en-US' | 'es-ES' | 'fr-FR' | 'ca-ES';
 
 interface LocalStorageConversation {
   id: string;
@@ -466,8 +466,8 @@ export class ChatComponent implements OnInit {
         this.recognition.lang = 'es-ES';
         alert('Speech language changed to Spanish');
         break;
-      case 'gl-ES':
-        this.recognition.lang = 'gl-ES';
+      case 'fr-FR':
+        this.recognition.lang = 'fr-FR';
         alert('Speech language changed to Galician');
         break;
       case 'ca-ES':
