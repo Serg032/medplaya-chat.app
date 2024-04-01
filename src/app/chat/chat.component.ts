@@ -470,7 +470,7 @@ export class ChatComponent implements OnInit {
         break;
       case 'fr-FR':
         this.recognition.lang = 'fr-FR';
-        alert('Speech language changed to Galician');
+        alert('Speech language changed to French');
         break;
       case 'ca-ES':
         this.recognition.lang = 'ca-ES';
