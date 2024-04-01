@@ -20,7 +20,6 @@ import {
   ConversationService,
 } from '../services/conversation.service';
 import {
-  ChatResponse,
   CreateMessageCommand,
   MessageService,
 } from '../services/message.service';
@@ -104,6 +103,7 @@ export class ChatComponent implements OnInit {
   private messagesLocalStorageKey = 'messages';
   public showDisclaimer: boolean = false;
   private disclaimerAcceptedKey = 'disclaimerAccepted';
+  public isRecording: boolean = false;
 
   recognition: any;
   recognizedText: string = '';
@@ -439,10 +439,12 @@ export class ChatComponent implements OnInit {
 
   startRecognition() {
     this.recognition.start();
+    this.isRecording = true;
   }
 
   stopRecognition() {
     this.recognition.stop();
+    this.isRecording = false;
   }
 
   public buildGuestNameDisplay(): string {

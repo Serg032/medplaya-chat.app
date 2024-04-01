@@ -241,3 +241,23 @@ mat-drawer-content {
   gap: 1rem;
   padding: 1rem;
 }
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.recording-feedback-circle {
+  animation: blink 1s infinite;
+  border-radius: 100%;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: rgb(212, 0, 0);
+}

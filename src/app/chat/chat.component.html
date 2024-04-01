@@ -138,12 +138,28 @@
               <img class="icon" src="../../assets/send.svg" alt="send-icon" />
             </button>
             <button
-              *ngIf="!isFirefox"
+              *ngIf="!isFirefox && !isRecording"
               type="submit"
               (click)="startRecognition()"
             >
-              <img class="icon" src="../../assets/record.svg" alt="send-icon" />
+              <img
+                class="icon"
+                src="../../assets/record.svg"
+                alt="start-recording-icon"
+              />
             </button>
+            <button
+              *ngIf="!isFirefox && isRecording"
+              type="submit"
+              (click)="stopRecognition()"
+            >
+              <img
+                class="icon"
+                src="../../assets/stop-circle.svg"
+                alt="stop-recording-icon"
+              />
+            </button>
+            <div *ngIf="isRecording" class="recording-feedback-circle"></div>
           </div>
         </div>
       </div>
