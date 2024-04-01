@@ -23,7 +23,6 @@
     "@angular/platform-browser-dynamic": "^17.1.0",
     "@angular/router": "^17.1.0",
     "dotenv": "^16.4.2",
-    "flag-icons": "^7.2.0",
     "jwt-decode": "^4.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
