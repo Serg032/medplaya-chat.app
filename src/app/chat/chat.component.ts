@@ -102,6 +102,8 @@ export class ChatComponent implements OnInit {
   private accessToken = 'accessToken';
   private conversationsLocalStorageKey = 'conversations';
   private messagesLocalStorageKey = 'messages';
+  public showDisclaimer: boolean = false;
+  private disclaimerAcceptedKey = 'disclaimerAccepted';
 
   recognition: any;
   recognizedText: string = '';
@@ -195,6 +197,10 @@ export class ChatComponent implements OnInit {
           this.routerNavigator.navigate(['']);
         }
       });
+
+    this.isDisclaimerAccepted()
+      ? (this.showDisclaimer = false)
+      : (this.showDisclaimer = true);
   }
 
   public getLastDatabaseConversation(): ConversationByQuery | undefined {
@@ -672,5 +678,18 @@ export class ChatComponent implements OnInit {
         JSON.stringify(localStorageMessages)
       );
     }
+  }
+
+  public acceptDisclaimer() {
+    localStorage.setItem(this.disclaimerAcceptedKey, 'true');
+    this.showDisclaimer = false;
+  }
+
+  private isDisclaimerAccepted(): boolean {
+    return localStorage.getItem(this.disclaimerAcceptedKey) === 'true';
+  }
+
+  public rejectDisclaimer() {
+    this.routerNavigator.navigate(['']);
   }
 }

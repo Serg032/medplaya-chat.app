@@ -220,6 +220,24 @@ mat-drawer-content {
   border-radius: 10px;
 }
 
-/* .flag {
-  margin: 5px;
-} */
+.disclaimer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-color: #ffffff;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  text-align: justify;
+}
+
+.disclaimer-buttons {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}

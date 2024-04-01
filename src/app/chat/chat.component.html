@@ -150,3 +150,40 @@
     </div>
   </mat-drawer-content>
 </mat-drawer-container>
+<div *ngIf="showDisclaimer" class="disclaimer">
+  <h3>Disclaimer</h3>
+  <span>
+    El servicio de asistencia proporcionado por "ClaudIA", nuestro robot de
+    información sobre el hotel, tiene como objetivo brindar datos precisos y
+    actualizados sobre las instalaciones, servicios y actividades disponibles en
+    el hotel o alrededores. La información proporcionada por el robot puede
+    estar sujeta a cambios sin previo aviso. No podemos garantizar la exactitud
+    absoluta o la totalidad de la información suministrada en todo momento.
+    Además, aunque nuestro robot está programado para ofrecer respuestas
+    precisas y útiles, puede haber ocasiones en las que la interpretación de las
+    preguntas o solicitudes de los usuarios no sea completamente precisa, lo que
+    podría resultar en respuestas incompletas o incorrectas. Por lo tanto,
+    recomendamos a nuestros clientes que utilicen la información proporcionada
+    por el robot como una guía general y que confirmen cualquier detalle
+    importante directamente con el personal del hotel. Nos esforzamos por
+    mejorar continuamente la precisión y la utilidad de nuestro servicio de
+    asistencia robótica, pero no podemos garantizar que esté libre de errores o
+    discrepancias en todo momento. Queda expresamente excluida cualquier
+    responsabilidad por daños directos, indirectos, incidentales, especiales,
+    consecuentes o ejemplares que puedan surgir del uso o la incapacidad de
+    utilizar el servicio de asistencia robótica, incluso si se nos ha informado
+    de la posibilidad de tales daños. Utilizar el servicio de información del
+    hotel a través del robot implica la aceptación de estos términos y
+    condiciones. Nos reservamos el derecho de modificar, actualizar o
+    descontinuar el servicio de asistencia robótica en cualquier momento sin
+    previo aviso.
+  </span>
+  <div class="disclaimer-buttons">
+    <button color="primary" mat-flat-button (click)="acceptDisclaimer()">
+      Accept
+    </button>
+    <button color="warn" mat-flat-button (click)="rejectDisclaimer()">
+      Reject
+    </button>
+  </div>
+</div>
