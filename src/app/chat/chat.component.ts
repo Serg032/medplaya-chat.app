@@ -240,7 +240,8 @@ export class ChatComponent implements OnInit {
     await this.getLocalStorageMessagesFromConversation();
   }
 
-  public async sendMessage() {
+  public async sendMessage(event: SubmitEvent) {
+    event.preventDefault();
     if (!this.currentLocalStorageConversation) {
       await this.createConversationFunction();
 

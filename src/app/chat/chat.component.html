@@ -131,37 +131,39 @@
         </div>
       </div>
       <div class="input-container">
-        <div class="input-and-buttons-container">
-          <input [formControl]="messageInput" />
-          <div class="icons-container">
-            <button type="submit" (click)="sendMessage()">
-              <img class="icon" src="../../assets/send.svg" alt="send-icon" />
-            </button>
-            <button
-              *ngIf="!isFirefox && !isRecording"
-              type="submit"
-              (click)="startRecognition()"
-            >
-              <img
-                class="icon"
-                src="../../assets/record.svg"
-                alt="start-recording-icon"
-              />
-            </button>
-            <button
-              *ngIf="!isFirefox && isRecording"
-              type="submit"
-              (click)="stopRecognition()"
-            >
-              <img
-                class="icon"
-                src="../../assets/stop-circle.svg"
-                alt="stop-recording-icon"
-              />
-            </button>
-            <div *ngIf="isRecording" class="recording-feedback-circle"></div>
+        <form (submit)="sendMessage($event)">
+          <div class="input-and-buttons-container">
+            <input [formControl]="messageInput" />
+            <div class="icons-container">
+              <button type="submit">
+                <img class="icon" src="../../assets/send.svg" alt="send-icon" />
+              </button>
+              <button
+                *ngIf="!isFirefox && !isRecording"
+                type="submit"
+                (click)="startRecognition()"
+              >
+                <img
+                  class="icon"
+                  src="../../assets/record.svg"
+                  alt="start-recording-icon"
+                />
+              </button>
+              <button
+                *ngIf="!isFirefox && isRecording"
+                type="submit"
+                (click)="stopRecognition()"
+              >
+                <img
+                  class="icon"
+                  src="../../assets/stop-circle.svg"
+                  alt="stop-recording-icon"
+                />
+              </button>
+              <div *ngIf="isRecording" class="recording-feedback-circle"></div>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </mat-drawer-content>
