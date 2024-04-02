@@ -110,12 +110,12 @@
       </div>
       <div class="messages-container" #messagesContainer>
         <div class="card-container" *ngFor="let chatMessage of chatMessages">
-          <img
+          <!-- <img
             class="ai-avatar"
             *ngIf="chatMessage.author === 'chat-gpt'"
             src="../../assets/CLAUDIA_avatar.svg"
             alt="ai-avatar"
-          />
+          /> -->
           <mat-card
             class="message-container"
             [ngClass]="{
