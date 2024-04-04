@@ -1,5 +1,13 @@
 <mat-drawer-container class="example-container" [hasBackdrop]="true">
   <mat-drawer class="drawer-container" #drawer>
+    <button class="icon-button close-icon" mat-flat-button (click)="drawer.toggle()">
+      <mat-icon
+        class="icon-container"
+        aria-hidden="false"
+        aria-label="Chevron Left"
+        fontIcon="close"
+      ></mat-icon>
+    </button>
     <div class="add-conversation">
       <button
         mat-flat-button

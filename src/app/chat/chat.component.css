@@ -16,6 +16,10 @@
   padding-bottom: 2rem;
 }
 
+.close-icon {
+  margin-bottom: 2rem;
+}
+
 .messages-container {
   overflow-y: auto;
   display: flex;
