@@ -87,20 +87,19 @@
           ></mat-icon>
         </button>
       </div>
-      <div class="h-div">
+      <div class="h-div username">
         <span
           ><b>{{ buildGuestNameDisplay() }}</b>
         </span>
       </div>
       <div class="h-div">
         <button class="icon-button" mat-flat-button (click)="logout()">
-          <div class="icon-container">
             <mat-icon
+              class="icon-container"
               aria-hidden="false"
               aria-label="logout"
               fontIcon="logout"
             ></mat-icon>
-          </div>
         </button>
       </div>
     </div>
