@@ -203,6 +203,10 @@ export class ChatComponent implements OnInit {
       : (this.showDisclaimer = true);
   }
 
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
   public getLastDatabaseConversation(): ConversationByQuery | undefined {
     if (this.databaseConversations.length > 0) {
       return this.databaseConversations.sort((a, b) => {
