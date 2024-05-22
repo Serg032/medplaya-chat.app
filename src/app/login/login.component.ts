@@ -43,7 +43,10 @@ export class LoginComponent {
     const checkinDate = value.checkInDate;
 
     if (username && checkinDate) {
-      await this.loginService.login(username, new Date(checkinDate).getTime());
+      await this.loginService.login({
+        username,
+        checkinTimestamp: Number(checkinDate),
+      });
     } else {
       alert('All fields needed');
     }

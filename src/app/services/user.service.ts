@@ -3,13 +3,23 @@ import { Router } from '@angular/router';
 import { MedplayaGuest } from '../login/login.component';
 import { environment } from '../../environments/environment';
 
-interface Query {
+interface LoginPayload {
   username: string;
+  checkinTimestamp: number;
 }
 
-export interface LoginResponse {
-  accessToken: String;
+export interface LoginSuccesfullResponse {
+  accessToken: string;
   guest: MedplayaGuest;
+}
+
+export interface LoginFailedResponse {
+  message:
+    | 'Guest not found'
+    | 'Wrong checkin date'
+    | 'Is to early to checkin'
+    | 'Is to late to checkin'
+    | 'Something went wrong';
 }
 
 export type Regime = 'FULL' | 'STANDARD' | 'BASIC';
@@ -39,108 +49,59 @@ export class UserService {
 
   private rootUrl = environment.apiUrl;
 
-  public async loginTest() {
-    const data = await fetch(`${this.rootUrl}/guests/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: 'radigalesm' }),
-    });
-
-    return await data.json();
-  }
-
   public async login(
-    username: string,
-    checkinDate: number
-  ): Promise<LoginResponse | string> {
+    payload: LoginPayload
+  ): Promise<LoginSuccesfullResponse | LoginFailedResponse> {
     try {
-      const query: Query = {
-        username,
-      };
-      const dataFetched = await fetch(`${this.rootUrl}/guests/login`, {
+      const data = await fetch(`${this.rootUrl}/guests/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(query),
+        body: JSON.stringify(payload),
       });
 
-      if (dataFetched.status === 404) {
+      const response = (await data.json()) as
+        | LoginSuccesfullResponse
+        | LoginFailedResponse;
+
+      if ('message' in response && response.message === 'Guest not found') {
         alert('El usuario no existe');
-        return 'El usuario no existe';
+        return { message: 'Guest not found' };
       }
-      if (dataFetched.status === 500) {
-        alert('Error en el servidor');
-        return 'Error en el servidor';
+      if ('message' in response && response.message === 'Wrong checkin date') {
+        alert('Fecha de entrada incorrecta');
+        return { message: 'Wrong checkin date' };
+      }
+      if (
+        'message' in response &&
+        response.message === 'Is to early to checkin'
+      ) {
+        alert('Es demasiado pronto para hacer el checkin');
+        return { message: 'Is to early to checkin' };
+      }
+      if (
+        'message' in response &&
+        response.message === 'Is to late to checkin'
+      ) {
+        alert('Es demasiado tarde para hacer el checkin');
+        return { message: 'Is to late to checkin' };
       }
 
-      const loginResponse = (await dataFetched.json()) as LoginResponse;
+      localStorage.setItem(
+        'accessToken',
+        (response as LoginSuccesfullResponse).accessToken.toString()
+      );
 
-      if (!loginResponse.guest) {
-        alert('User not found');
-        return 'User not found';
-      }
-
-      this.validateClientLogin(loginResponse.guest, checkinDate);
-      localStorage.setItem('accessToken', loginResponse.accessToken.toString());
+      this.navigateToChat((response as LoginSuccesfullResponse).guest.id);
 
       return {
-        accessToken: loginResponse.accessToken,
-        guest: loginResponse.guest,
+        accessToken: (response as LoginSuccesfullResponse).accessToken,
+        guest: (response as LoginSuccesfullResponse).guest,
       };
     } catch (error) {
-      return 'error';
+      return { message: 'Something went wrong' };
     }
-  }
-
-  private validateClientLogin(guest: MedplayaGuest, checkinDate: number): void {
-    const marshledGuestDateIn = new Date(Number(guest.dateIn));
-    const marshledGuestDateOut = new Date(Number(guest.dateOut));
-    marshledGuestDateIn.setHours(0);
-
-    const earlyLoginLimit = this.buildEarlyLoginLimit(marshledGuestDateIn);
-    const latelyLoginLimit = this.buildLatelyLoginLimit(marshledGuestDateOut);
-
-    if (checkinDate === marshledGuestDateIn.getTime()) {
-      const todayDate = this.buildToday();
-
-      if (todayDate.getTime() < earlyLoginLimit.getTime()) {
-        alert('Access denied, too early');
-        return;
-      } else if (todayDate.getTime() > latelyLoginLimit.getTime()) {
-        alert('Access denied, too late');
-        return;
-      } else {
-        this.navigateToChat(guest.id);
-      }
-    } else {
-      alert('Wrong check in date');
-      return;
-    }
-  }
-
-  private buildEarlyLoginLimit(marshaledCheckinDate: Date): Date {
-    const limit = new Date(marshaledCheckinDate.getTime());
-    limit.setDate(marshaledCheckinDate.getDate() - 3);
-    return limit;
-  }
-
-  private buildLatelyLoginLimit(marshaledCheckoutDate: Date): Date {
-    const limit = new Date(marshaledCheckoutDate.getTime());
-    limit.setDate(marshaledCheckoutDate.getDate() + 1);
-    return limit;
-  }
-
-  private buildToday(): Date {
-    const today = new Date();
-    today.setHours(0);
-    today.setMinutes(0);
-    today.setSeconds(0);
-    today.setMilliseconds(0);
-
-    return today;
   }
 
   private navigateToChat(clientId: string) {
