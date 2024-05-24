@@ -453,11 +453,7 @@ export class ChatComponent implements OnInit {
   }
 
   public buildGuestNameDisplay(): string {
-    if (this.guest) {
-      return this.guest.name + ' ' + this.guest.surname1;
-    }
-
-    return 'CloudIA';
+    return 'Medplaya AI Chat';
   }
 
   public changeLanguage(lang: SupporttedLanguages): void {
